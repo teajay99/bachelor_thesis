@@ -1,7 +1,7 @@
 TARGET ?= main
 SRC_DIRS ?= ./src
 LIB_DIRS ?= ./lib
-INC_DIRS ?= ./ext_inc
+EXT_INC_DIRS ?= ./ext_inc
 SYS_LIBS ?= -lncurses -lutil -L/usr/local/cuda/lib64 -lcuda -lcudart
 CXXFLAGS+= --std=c++17 -O3
 
@@ -13,10 +13,9 @@ LIBS := $(shell find $(LIB_DIRS) -name *.a)
 DEPS := $(OBJS:.o=.d)
 
 
-#all:
-#	@echo $(value LIBS)
-
+INC_DIRS += $(shell find $(EXT_INC_DIRS) -maxdepth 1 -type d)
 INC_DIRS += $(shell find $(SRC_DIRS) -type d)
+
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
