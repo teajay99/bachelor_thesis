@@ -14,7 +14,7 @@ public:
     sites = iSites;
     siteCount = intPow(sites, dim);
     for (int i = 0; i < dim; i++) {
-      basis[i] = intPow(n, i);
+      basis[i] = intPow(sites, i);
     }
     beta = iBeta;
   };
