@@ -8,8 +8,11 @@
 
 template <int N, int dim> class suNAction {
 public:
-  suNAction(int n, double iBeta) {
-    siteCount = intPow(n, dim);
+  // Constructor for storing site count and Beta, as well as calculate derived
+  // quantities
+  suNAction(int iSites, double iBeta) {
+    sites = iSites;
+    siteCount = intPow(sites, dim);
     for (int i = 0; i < dim; i++) {
       basis[i] = intPow(n, i);
     }
@@ -26,14 +29,20 @@ public:
   + mu] (for n sites per dimension)
   */
 
+  // Evaluates the terms in the action dependent on U_mu(loc)
   double evaluateDelta(Eigen::Matrix<std::complex<double>, N, N> *fields,
                        int loc, int mu) {
+    // return value
     double sum = 0.;
+    // Iterating over dimensions
     for (int i = 0; i < dim; i++) {
       if (i != mu) {
+        // Evaluating Upper Plaquette
         Eigen::Matrix<std::complex<double>, N, N> pProd =
             plaquetteProduct(fields, loc, mu, i);
         sum += (pProd + pProd.adjoint()).trace().real();
+
+        // Evaluating Lower Plaquette
         pProd = plaquetteProduct(
             fields, (loc + siteCount - basis[i]) % siteCount, mu, i);
         sum += (pProd + pProd.adjoint()).trace().real();
@@ -42,6 +51,7 @@ public:
     return ((-beta) / (2 * N)) * sum;
   };
 
+  // Evaluate Plaquette Product starting from loc, in direction mu and nu
   Eigen::Matrix<std::complex<double>, N, N>
   plaquetteProduct(Eigen::Matrix<std::complex<double>, N, N> *fields, int loc,
                    int mu, int nu) {
@@ -55,6 +65,7 @@ public:
 private:
   int siteCount;
   int basis[dim];
+  int sites;
   double beta;
 };
 
