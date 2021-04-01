@@ -31,14 +31,14 @@ int main() {
   std::uniform_real_distribution<double> uni_dist(0., 1.);
 
   // Lattice Sites per Dimension
-  int sites = 8;
+  int sites = 6;
   // Space-Time Dimensions
   const int dim = 4;
   // Lattice Sites
   int siteCount = intPow(sites, dim);
 
   // Creating an Action Object
-  suNAction<2, dim> action(sites, 1.8);
+  suNAction<2, dim> action(sites, 2.0);
   // Array to store field configuration
   Eigen::Matrix2cd fields[dim * siteCount];
 
@@ -52,7 +52,7 @@ int main() {
   outputFile << "single\tplane\thypercube" << std::endl;
 
   // Iterations over measurements
-  for (int meas = 0; meas < 250; meas++) {
+  for (int meas = 0; meas < 100; meas++) {
     // Metropolissteps per measurement
     for (int iter = 0; iter < 10; iter++) {
       // Iteration over all lattice sites
