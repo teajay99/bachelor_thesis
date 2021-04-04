@@ -8,29 +8,128 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 
-class su2Element {
-public:
-  __device__ __host__ su2Element();
-  __device__ __host__ su2Element(double[4]);
-  __device__ __host__ ~su2Element();
+/*
+#  SU(2) in fundamental rep stored as
+#
+#  (  array[0] + i* array[1] , array[2] + i* array[3] )
+#  ( -array[2] + i* array[3] , array[0] - i* array[1] )
+#
+*/
 
-  __device__ __host__ friend su2Element operator*(const su2Element &e1,
+class su2Element {
+
+public:
+  __device__ __host__ su2Element() {
+    element[0] = 1;
+    element[1] = 0;
+    element[2] = 0;
+    element[3] = 0;
+  };
+
+  __device__ __host__ su2Element(double *input) {
+    for (int i = 0; i < 4; i++) {
+      element[i] = input[i];
+    }
+  };
+
+  __device__ __host__ ~su2Element(){};
+
+  __device__ __host__ double trace() { return 2 * element[0]; }
+
+  friend __device__ __host__ su2Element operator*(const su2Element &e1,
                                                   const su2Element &e2);
-  __device__ __host__ double trace();
-  __device__ __host__ su2Element adjoint();
+  __device__ __host__ su2Element adjoint() {
+    double adjoint[4] = {element[0], -element[1], -element[2], -element[3]};
+    return su2Element(&adjoint[0]);
+  };
 
   friend std::ostream &operator<<(std::ostream &os, const su2Element &e);
-  __device__ __host__ double operator[](int i) const;
-  __device__ __host__ double &operator[](int i);
 
-  su2Element randomize(double delta, std::default_random_engine &gen);
-  __device__ su2Element randomize(double delta, curandState_t &state);
+  __device__ __host__ double operator[](int i) const { return element[i]; }
+  __device__ __host__ double &operator[](int i) { return element[i]; }
 
-  __device__ __host__ void renormalize();
+  su2Element randomize(double delta, std::default_random_engine &gen) {
+
+    std::normal_distribution<double> normal_dist(0., 1.);
+    std::uniform_real_distribution<double> uni_dist(0, (M_PI * delta) / 2.);
+
+    double alpha = uni_dist(gen);
+
+    double pnt[3];
+    for (int i = 0; i < 3; i++) {
+      pnt[i] = normal_dist(gen);
+    }
+    return this->randomize(alpha, &pnt[0]);
+  };
+
+  __device__ su2Element randomize(double delta, curandState_t *state) {
+    double alpha = curand_uniform_double(state) * ((M_PI * delta) / 2.);
+    double pnt[3];
+    for (int i = 0; i < 3; i++) {
+      pnt[i] = curand_normal_double(state);
+    }
+    return this->randomize(alpha, &pnt[0]);
+  };
+
+  __device__ __host__ void renormalize() {
+    double norm = 0;
+    for (int i = 0; i < 4; i++) {
+      norm += element[i] * element[i];
+    }
+
+    norm = sqrt(norm);
+
+    for (int i = 0; i < 4; i++) {
+      element[i] /= norm;
+    }
+  };
 
 private:
-  __device__ __host__ su2Element randomize(double alpha, double *pnt);
+  __device__ __host__ su2Element randomize(double alpha, double *pnt) {
+    double norm = 0;
+
+    for (int i = 0; i < 3; i++) {
+      norm += pnt[i] * pnt[i];
+    }
+
+    norm = sqrt(norm);
+    for (int i = 0; i < 3; i++) {
+      pnt[i] /= norm;
+      pnt[i] *= sin(alpha);
+    }
+    double coord[4] = {cos(alpha), pnt[0], pnt[1], pnt[2]};
+
+    if (norm == 0) {
+      printf("Norm Null detected: (%f,%f,%f,%f)\n", coord[0], coord[1],
+             coord[2], coord[3]);
+    }
+
+    return (*this) * su2Element(&coord[0]);
+  };
+
   double element[4];
+};
+
+inline __device__ __host__ su2Element operator*(const su2Element &e1,
+                                                const su2Element &e2) {
+  double product[4];
+  product[0] =
+      (e1[0] * e2[0]) - (e1[1] * e2[1]) - (e1[2] * e2[2]) - (e1[3] * e2[3]);
+  product[1] =
+      (e1[0] * e2[1]) + (e1[1] * e2[0]) + (e1[2] * e2[3]) - (e1[3] * e2[2]);
+  product[2] =
+      (e1[0] * e2[2]) - (e1[1] * e2[3]) + (e1[2] * e2[0]) + (e1[3] * e2[1]);
+  product[3] =
+      (e1[0] * e2[3]) + (e1[1] * e2[2]) - (e1[2] * e2[1]) + (e1[3] * e2[0]);
+  return su2Element(&product[0]);
+};
+
+inline std::ostream &operator<<(std::ostream &os, const su2Element &e) {
+  os << "(" << e[0] << "," << e[1] << ") ";
+  os << "(" << e[2] << "," << e[3] << ") " << std::endl;
+  os << "(" << -e[2] << "," << e[3] << ") ";
+  os << "(" << e[0] << "," << -e[1] << ") " << std::endl;
+  return os;
 };
 
 #endif
