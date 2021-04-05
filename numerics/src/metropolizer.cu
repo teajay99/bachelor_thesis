@@ -29,7 +29,6 @@ __global__ void kernel_probe_site(su2Action<dim> act, su2Element *fields,
     return;
   }
 
-  // for (int mu = 0; mu < dim; mu++) {
   for (int i = 0; i < multiProbe; i++) {
     int loc = (dim * site) + mu;
     // Evaluates action "around" link Variable U_mu (site)
@@ -47,7 +46,6 @@ __global__ void kernel_probe_site(su2Action<dim> act, su2Element *fields,
     }
     fields[loc].renormalize();
   }
-  //}
 }
 
 template <int dim>

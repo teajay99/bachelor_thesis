@@ -1,5 +1,8 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
+//#include<sstream>
+#include<iomanip>
+#include <string>
 
 #include "cxxopts.hpp"
 #include "metropolizer.hpp"
@@ -32,7 +35,7 @@ int main(int argc, char **argv) {
   int latSize = 0;
   bool cold = false;
   int measurements = 0;
-
+  std::string fName;
   try {
 
     auto result = options.parse(argc, argv);
@@ -48,6 +51,7 @@ int main(int argc, char **argv) {
     beta = result["beta"].as<double>();
     latSize = result["lattice-size"].as<int>();
     measurements = result["measurements"].as<int>();
+    fName = result["output"].as<std::string>();
 
   } catch (const cxxopts::OptionException &e) {
     std::cout << "error parsing options: " << e.what() << std::endl;
@@ -56,13 +60,15 @@ int main(int argc, char **argv) {
   }
 
   su2Action<4> action(latSize, beta);
-  metropolizer<4> metro(action, 15, 0.2, cold);
-
+  metropolizer<4> metro(action, 10, 0.1, cold);
 
   std::ofstream file;
+  file.open(fName);
   for (int i = 0; i < measurements; i++) {
-    double plaquette = metro.sweep(50);
-    std::cout << i << ") "<< plaquette << std::endl;
-    file << i << "\t" << plaquette << std::endl;
+    double plaquette = metro.sweep(1);
+    std::cout << i << " " << std::scientific << std::setw(18)
+              << std::setprecision(15) << plaquette << std::endl;
+    file << i << "\t" << std::scientific << std::setw(18)
+         << std::setprecision(15) << plaquette << std::endl;
   }
 }
