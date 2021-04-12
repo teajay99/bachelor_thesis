@@ -34,7 +34,7 @@ public:
 
   __device__ __host__ ~su2Element(){};
 
-  __device__ __host__ double trace() { return 2 * element[0]; }
+  __device__ __host__ double trace() { return 2 * element[0]; };
 
   friend __device__ __host__ su2Element operator*(const su2Element &e1,
                                                   const su2Element &e2);
@@ -48,10 +48,10 @@ public:
   __device__ __host__ double operator[](int i) const { return element[i]; }
   __device__ __host__ double &operator[](int i) { return element[i]; }
 
-  su2Element randomize(double delta, std::default_random_engine &gen) {
+  su2Element randomize(double delta, std::mt19937 &gen) {
 
     std::normal_distribution<double> normal_dist(0., 1.);
-    std::uniform_real_distribution<double> uni_dist(0, (M_PI * delta) / 2.);
+    std::uniform_real_distribution<double> uni_dist(0, M_PI * delta * 2);
 
     double alpha = uni_dist(gen);
 
@@ -63,7 +63,7 @@ public:
   };
 
   __device__ su2Element randomize(double delta, curandState_t *state) {
-    double alpha = curand_uniform_double(state) * ((M_PI * delta) / 2.);
+    double alpha = curand_uniform_double(state) * (M_PI * delta * 2.);
     double pnt[3];
     for (int i = 0; i < 3; i++) {
       pnt[i] = curand_normal_double(state);
@@ -87,6 +87,7 @@ public:
 private:
   __device__ __host__ su2Element randomize(double alpha, double *pnt) {
     double norm = 0;
+    double sAlpha = sin(alpha);
 
     for (int i = 0; i < 3; i++) {
       norm += pnt[i] * pnt[i];
@@ -95,14 +96,9 @@ private:
     norm = sqrt(norm);
     for (int i = 0; i < 3; i++) {
       pnt[i] /= norm;
-      pnt[i] *= sin(alpha);
+      pnt[i] *= sAlpha;
     }
     double coord[4] = {cos(alpha), pnt[0], pnt[1], pnt[2]};
-
-    if (norm == 0) {
-      printf("Norm Null detected: (%f,%f,%f,%f)\n", coord[0], coord[1],
-             coord[2], coord[3]);
-    }
 
     return (*this) * su2Element(&coord[0]);
   };

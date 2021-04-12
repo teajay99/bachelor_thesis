@@ -31,7 +31,6 @@ def makeFitAbs(x, y, xNoise, yNoise, fitFunc, b0):
 
     # Run the regression.
     out = od.run()
-    #out.pprint()
     CRS = getCRS(y, fitFunc(out.beta, x), yNoise, len(b0))
 
     return (out.beta, out.sd_beta, CRS)
@@ -44,7 +43,7 @@ def makeFit(x, y, fitFunc, b0):
 
 
 def makeFit1DErr(xin, yin, func, p0=None):
-    x = np.array([i.n for i in xin])
+    x = xin
     y = np.array([i.n for i in yin])
     yerr = np.array([i.std_dev for i in yin])
     popt, pcov = curve_fit(func, x, y, sigma=yerr, p0=p0)
@@ -54,7 +53,7 @@ def makeFit1DErr(xin, yin, func, p0=None):
 
     perr = np.sqrt(np.diag(pcov))
 
-    return (CRS, popt, perr)
+    return (popt, perr, CRS)
 
 
 def makeParamFit(x_in, y_in, fitFunc, params):
@@ -161,6 +160,7 @@ def plot1DErrPoints(x, y, label="", clr='k'):
                 fmt='k.',
                 marker="_",
                 ecolor=clr,
+                mec=clr,
                 elinewidth=0.8,
                 capsize=2.5,
                 capthick=0.8,

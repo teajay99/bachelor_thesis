@@ -1,9 +1,10 @@
 #include <fstream>
 #include <iostream>
 //#include<sstream>
-#include<iomanip>
+#include <iomanip>
 #include <string>
 
+#include "cudaMetropolizer.hpp"
 #include "cxxopts.hpp"
 #include "metropolizer.hpp"
 #include "su2Action.hpp"
@@ -13,9 +14,12 @@ cxxopts::Options getOptions() {
                            "Cuda Based implementation of a SU(2) Metropolis "
                            "Monte Carlo Simulation.");
 
-  options.add_options()("h,help", "Show Help")(
+  options.add_options()("h,help",
+                        "Show Help")("cuda", "Use NVIDIA GPU for calculation")(
       "b,beta", "Value of Beta for Simulation",
       cxxopts::value<double>()->default_value("2.0"))(
+      "d,delta", "Search Radius for Simulation",
+      cxxopts::value<double>()->default_value("0.2"))(
       "l,lattice-size", "Size of the lattice (l^4)",
       cxxopts::value<int>()->default_value("8"))(
       "o,output", "Output File Name",
@@ -28,14 +32,24 @@ cxxopts::Options getOptions() {
   return options;
 }
 
+void logResults(int i, std::ofstream &file, double plaquette, double hitRate) {
+  std::cout << i << " " << std::scientific << std::setw(18)
+            << std::setprecision(15) << plaquette << " " << hitRate
+            << std::endl;
+  file << i << "\t" << std::scientific << std::setw(18) << std::setprecision(15)
+       << plaquette << "\t" << hitRate << std::endl;
+}
+
 int main(int argc, char **argv) {
   cxxopts::Options options = getOptions();
 
   double beta = 0;
   int latSize = 0;
   bool cold = false;
+  bool useCuda = false;
   int measurements = 0;
   std::string fName;
+  double delta = 0;
   try {
 
     auto result = options.parse(argc, argv);
@@ -48,10 +62,15 @@ int main(int argc, char **argv) {
       cold = true;
     }
 
+    if (result.count("cuda")) {
+      useCuda = true;
+    }
+
     beta = result["beta"].as<double>();
     latSize = result["lattice-size"].as<int>();
     measurements = result["measurements"].as<int>();
     fName = result["output"].as<std::string>();
+    delta = result["delta"].as<double>();
 
   } catch (const cxxopts::OptionException &e) {
     std::cout << "error parsing options: " << e.what() << std::endl;
@@ -60,15 +79,21 @@ int main(int argc, char **argv) {
   }
 
   su2Action<4> action(latSize, beta);
-  metropolizer<4> metro(action, 10, 0.1, cold);
 
   std::ofstream file;
   file.open(fName);
-  for (int i = 0; i < measurements; i++) {
-    double plaquette = metro.sweep(1);
-    std::cout << i << " " << std::scientific << std::setw(18)
-              << std::setprecision(15) << plaquette << std::endl;
-    file << i << "\t" << std::scientific << std::setw(18)
-         << std::setprecision(15) << plaquette << std::endl;
+  if (useCuda) {
+    cudaMetropolizer<4> metro(action, 10, delta, cold);
+    for (int i = 0; i < measurements; i++) {
+      double plaquette = metro.sweep();
+      logResults(i, file, plaquette, metro.getHitRate());
+    }
+  } else {
+    metropolizer<4> metro(action, 10, delta, cold);
+    for (int i = 0; i < measurements; i++) {
+      double plaquette = metro.sweep();
+      logResults(i, file, plaquette, metro.getHitRate());
+    }
   }
+  file.close();
 }

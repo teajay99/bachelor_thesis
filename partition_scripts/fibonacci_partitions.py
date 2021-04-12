@@ -29,7 +29,7 @@ def getSpherePoints(N):
 
 
 def getCubePoints(N):
-    out = [[0, 0, 0] for i in range(N)]
+    out = [[0, 0, 0] for i in range(N**2)]
 
     for n in range(N):
         out[n] = [(n + 1) / (N + 1), ((n + 1) * sqrt(2)) % 1, 0]
