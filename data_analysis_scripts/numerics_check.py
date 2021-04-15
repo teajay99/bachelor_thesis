@@ -112,15 +112,21 @@ class numericsChecker:
 
         pathlib.Path(WORK_DIR + "/self_made").mkdir(exist_ok=True)
         for i in range(len(self.betas)):
-            subprocess.call([
-                "./../numerics/main", "--cuda", "-m",
-                str(sweeps), "-b",
-                str(self.betas[i]), "-d",
-                str(deltas[i]), "-l",
-                str(self.latSize), "-o",
-                WORK_DIR + "/self_made/data-{}.csv".format(i)
-            ],
-                            stdout=subprocess.DEVNULL)
+            subprocess.call(
+                [
+                    "./../numerics/main",  #"--cuda"
+                    "-m",
+                    str(sweeps),
+                    "-b",
+                    str(self.betas[i]),
+                    "-d",
+                    str(deltas[i]),
+                    "-l",
+                    str(self.latSize),
+                    "-o",
+                    WORK_DIR + "/self_made/data-{}.csv".format(i)
+                ],
+                stdout=subprocess.DEVNULL)
             if verbose:
                 print("({}/{}) Recorded Self Made Data for beta={}".format(
                     i + 1, len(self.betas), self.betas[i]))
@@ -180,8 +186,8 @@ class numericsChecker:
             refData[i] = ufloat(np.mean(refRaw), np.std(refRaw))
 
         def highCoupling(b, x):
-            # out = (-(112 / 1024) + (128524 / 1244160) -
-            #        (211991 / 8709120)) * (x**11)
+            out = (-(112 / 1024) + (128524 / 1244160) -
+                   (211991 / 8709120)) * (x**11)
             out = ((16 / 256) - (196 / 4608) + (1001 / 172800)) * (x**9)
             out += (-(4 / 96) + (29 / 1440)) * (x**7)
             out += -((1 / 48) * (x**3)) + (((4 / 96) - (5 / 288)) * (x**5))
@@ -210,11 +216,18 @@ class numericsChecker:
                            1,
                            label="High Coupling Exp.",
                            clr="b")
-        # pltLib.plotFitFunc(lowCoupling, [],
-        #                    5,
-        #                    100,
-        #                    clr="b",
-        #                    label="Low Coupling Exp.")
+        pltLib.export("numCheckPlt1.pgf")
+        pltLib.endPlot()
+
+        pltLib.startNewPlot("$\\beta$", "$W_{\\textrm{meas}}(1,1)$", "")
+        pltLib.setLogScale(True, False)
+        pltLib.plot1DErrPoints(beta, selfData, label="Messpunkte")
+        pltLib.plot1DErrPoints(beta, refData, label="Referenzpunkte", clr="r")
+        pltLib.plotFitFunc(highCoupling, [],
+                           0.1,
+                           1,
+                           label="High Coupling Exp.",
+                           clr="b")
         pltLib.export("numCheckPlt1.pgf")
         pltLib.endPlot()
 
@@ -232,9 +245,9 @@ class numericsChecker:
 
 
 def main():
-    sweeps = 1000
+    sweeps = 600
     latSize = 4
-    thermTime = 500
+    thermTime = 350
     nc = numericsChecker(-1, 2, 40, latSize, sweeps, thermTime)
 
     #nc.calibrateDeltas()

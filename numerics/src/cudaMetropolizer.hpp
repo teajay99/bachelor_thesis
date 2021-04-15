@@ -1,6 +1,7 @@
 #ifndef CUDAMETROPOLIZER_HPP
 #define CUDAMETROPOLIZER_HPP
 
+#include "config.hpp"
 #include "su2Action.hpp"
 #include "su2Element.hpp"
 
@@ -23,19 +24,18 @@ private:
   double hitRate;
   su2Action<dim> action;
   int randStateCount;
-  curandStateMtgp32 *randStates;
-  mtgp32_kernel_params *randStateParams;
+  CUDA_RAND_STATE_TYPE *randStates;
   su2Element *fields;
 };
 
-template class cudaMetropolizer<2>;
-template class cudaMetropolizer<3>;
+// template class cudaMetropolizer<2>;
+// template class cudaMetropolizer<3>;
 template class cudaMetropolizer<4>;
-template class cudaMetropolizer<5>;
-template class cudaMetropolizer<6>;
-template class cudaMetropolizer<7>;
-template class cudaMetropolizer<8>;
-template class cudaMetropolizer<9>;
-template class cudaMetropolizer<10>;
+// template class cudaMetropolizer<5>;
+// template class cudaMetropolizer<6>;
+// template class cudaMetropolizer<7>;
+// template class cudaMetropolizer<8>;
+// template class cudaMetropolizer<9>;
+// template class cudaMetropolizer<10>;
 
 #endif

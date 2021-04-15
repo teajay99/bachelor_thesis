@@ -28,12 +28,12 @@ template <int dim> double metropolizer<dim>::sweep() {
       int loc = (dim * site) + mu;
       for (int i = 0; i < multiProbe; i++) {
         // Evaluates action "around" link Variable U_mu (site)
-        double oldVal = action.evaluateDelta(&fields[0], site, mu);
+        double oldVal = action.evaluateDelta(fields, site, mu);
         su2Element oldElement = fields[loc];
         fields[loc] = oldElement.randomize(delta, generator);
 
         // Evaluating action with new link Variable
-        double newVal = action.evaluateDelta(&fields[0], site, mu);
+        double newVal = action.evaluateDelta(fields, site, mu);
 
         // Deciding wether to keep the new link Variable
         if ((newVal > oldVal) &&

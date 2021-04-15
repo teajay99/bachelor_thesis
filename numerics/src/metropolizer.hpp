@@ -24,14 +24,14 @@ private:
   su2Element *fields;
 };
 
-template class metropolizer<2>;
-template class metropolizer<3>;
+// template class metropolizer<2>;
+// template class metropolizer<3>;
 template class metropolizer<4>;
-template class metropolizer<5>;
-template class metropolizer<6>;
-template class metropolizer<7>;
-template class metropolizer<8>;
-template class metropolizer<9>;
-template class metropolizer<10>;
+// template class metropolizer<5>;
+// template class metropolizer<6>;
+// template class metropolizer<7>;
+// template class metropolizer<8>;
+// template class metropolizer<9>;
+// template class metropolizer<10>;
 
 #endif

@@ -5,6 +5,7 @@
 #ifndef SU2ELEMENT_HPP
 #define SU2ELEMENT_HPP
 
+#include "config.hpp"
 #include <cuda.h>
 #include <curand_kernel.h>
 
@@ -62,7 +63,7 @@ public:
     return this->randomize(alpha, &pnt[0]);
   };
 
-  __device__ su2Element randomize(double delta, curandState_t *state) {
+  __device__ su2Element randomize(double delta, CUDA_RAND_STATE_TYPE *state) {
     double alpha = curand_uniform_double(state) * (M_PI * delta * 2.);
     double pnt[3];
     for (int i = 0; i < 3; i++) {
