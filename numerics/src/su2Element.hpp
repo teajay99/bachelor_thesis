@@ -31,7 +31,7 @@ public:
     for (int i = 0; i < 4; i++) {
       element[i] = input[i];
     }
-  };
+  }
 
   __device__ __host__ ~su2Element(){};
 
@@ -101,7 +101,7 @@ private:
     }
     double coord[4] = {cos(alpha), pnt[0], pnt[1], pnt[2]};
 
-    return (*this) * su2Element(&coord[0]);
+    return su2Element(&element[0]) * su2Element(&coord[0]);
   };
 
   double element[4];

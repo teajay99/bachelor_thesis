@@ -22,6 +22,8 @@ cxxopts::Options getOptions() {
       cxxopts::value<double>()->default_value("0.2"))(
       "l,lattice-size", "Size of the lattice (l^4)",
       cxxopts::value<int>()->default_value("8"))(
+      "hits", "Hits per site per Measurement",
+      cxxopts::value<int>()->default_value("10"))(
       "o,output", "Output File Name",
       cxxopts::value<std::string>()->default_value("data.csv"))(
       "m,measurements", "Number of Sweeps",
@@ -48,6 +50,7 @@ int main(int argc, char **argv) {
   bool cold = false;
   bool useCuda = false;
   int measurements = 0;
+  int multiProbe = 0;
   std::string fName;
   double delta = 0;
   try {
@@ -71,6 +74,7 @@ int main(int argc, char **argv) {
     measurements = result["measurements"].as<int>();
     fName = result["output"].as<std::string>();
     delta = result["delta"].as<double>();
+    multiProbe = result["hits"].as<int>();
 
   } catch (const cxxopts::OptionException &e) {
     std::cout << "error parsing options: " << e.what() << std::endl;
@@ -83,13 +87,13 @@ int main(int argc, char **argv) {
   std::ofstream file;
   file.open(fName);
   if (useCuda) {
-    cudaMetropolizer<4> metro(action, 10, delta, cold);
+    cudaMetropolizer<4> metro(action, multiProbe, delta, cold);
     for (int i = 0; i < measurements; i++) {
       double plaquette = metro.sweep();
       logResults(i, file, plaquette, metro.getHitRate());
     }
   } else {
-    metropolizer<4> metro(action, 10, delta, cold);
+    metropolizer<4> metro(action, multiProbe, delta, cold);
     for (int i = 0; i < measurements; i++) {
       double plaquette = metro.sweep();
       logResults(i, file, plaquette, metro.getHitRate());

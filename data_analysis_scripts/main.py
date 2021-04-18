@@ -104,7 +104,7 @@ class numericsChecker:
         pltLib.plotFitFunc(fitFunc, p, 0.1, 10)
         pltLib.endPlot()
 
-    def recordSelfMadeData(self, sweeps=0, deltas=[], verbose=False):
+    def recordSelfMadeDataGPU(self, sweeps=0, deltas=[], verbose=False):
         if sweeps == 0:
             sweeps = self.sweeps
         if len(deltas) == 0:
@@ -112,22 +112,42 @@ class numericsChecker:
 
         pathlib.Path(WORK_DIR + "/self_made").mkdir(exist_ok=True)
         for i in range(len(self.betas)):
-            subprocess.call(
-                [
-                    "./../numerics/main",  #"--cuda"
-                    "-m",
-                    str(sweeps),
-                    "-b",
-                    str(self.betas[i]),
-                    "-d",
-                    str(deltas[i]),
-                    "-l",
-                    str(self.latSize),
-                    "-o",
-                    WORK_DIR + "/self_made/data-{}.csv".format(i)
-                ],
-                stdout=subprocess.DEVNULL)
+            subprocess.call([
+                "./../numerics/main", "--cuda", "-m",
+                str(sweeps), "-b",
+                str(self.betas[i]), "-d",
+                str(deltas[i]), "-l",
+                str(self.latSize), "-o",
+                WORK_DIR + "/self_made/data-{}.csv".format(i)
+            ],
+                            stdout=subprocess.DEVNULL)
             if verbose:
+                print("({}/{}) Recorded Self Made Data for beta={}".format(
+                    i + 1, len(self.betas), self.betas[i]))
+
+    def recordSelfMadeDataCPU(self):
+        threads = 8
+        runs = (len(self.betas) + 8 - 1) // threads
+        for j in range(runs):
+            prcs = []
+            for t in range(threads):
+                i = (j * threads) + t
+                if i < len(self.betas):
+                    pathlib.Path(WORK_DIR + "/ref_" +
+                                 str(i)).mkdir(exist_ok=True)
+                    prcs.append(
+                        subprocess.Popen([
+                            "./../numerics/main", "-m",
+                            str(self.sweeps), "-b",
+                            str(self.betas[i]), "-d",
+                            str(self.deltas[i]), "-l",
+                            str(self.latSize), "-o",
+                            WORK_DIR + "/self_made/data-{}.csv".format(i)
+                        ],
+                                         stdout=subprocess.DEVNULL))
+            for t in range(threads):
+                i = (j * threads) + t
+                prcs[t].wait()
                 print("({}/{}) Recorded Self Made Data for beta={}".format(
                     i + 1, len(self.betas), self.betas[i]))
 
@@ -186,11 +206,17 @@ class numericsChecker:
             refData[i] = ufloat(np.mean(refRaw), np.std(refRaw))
 
         def highCoupling(b, x):
-            out = (-(112 / 1024) + (128524 / 1244160) -
-                   (211991 / 8709120)) * (x**11)
-            out = ((16 / 256) - (196 / 4608) + (1001 / 172800)) * (x**9)
+            out = (-(3008 / 8192) + (112494928 / 212336640) -
+                   (388403644 / 1486356480) +
+                   (1474972157 / 33443020800)) * (x**15)
+            out += ((320 / 2048) - (688 / 4096) + (21364 / 368640) -
+                    (264497 / 40642560)) * (x**13)
+            out += (-(112 / 1024) + (128524 / 1244160) -
+                    (211991 / 8709120)) * (x**11)
+            out += ((16 / 256) - (196 / 4608) + (1001 / 172800)) * (x**9)
             out += (-(4 / 96) + (29 / 1440)) * (x**7)
-            out += -((1 / 48) * (x**3)) + (((4 / 96) - (5 / 288)) * (x**5))
+            out += (((4 / 96) - (5 / 288)) * (x**5))
+            out += -((1 / 48) * (x**3))
             return out
 
         def lowCoupling(b, x):
@@ -198,7 +224,7 @@ class numericsChecker:
 
         hc_index = self.sweeps
         for i in range(len(self.betas)):
-            if self.betas[i] > 1:
+            if self.betas[i] > 0.85:
                 hc_index = i
                 break
 
@@ -212,11 +238,11 @@ class numericsChecker:
                                label="Referenzpunkte",
                                clr="r")
         pltLib.plotFitFunc(highCoupling, [],
-                           0.1,
-                           1,
+                           0.01,
+                           0.85,
                            label="High Coupling Exp.",
                            clr="b")
-        pltLib.export("numCheckPlt1.pgf")
+        pltLib.export("numCheckPlt0.pgf")
         pltLib.endPlot()
 
         pltLib.startNewPlot("$\\beta$", "$W_{\\textrm{meas}}(1,1)$", "")
@@ -245,16 +271,16 @@ class numericsChecker:
 
 
 def main():
-    sweeps = 600
+    sweeps = 1000
     latSize = 4
-    thermTime = 350
-    nc = numericsChecker(-1, 2, 40, latSize, sweeps, thermTime)
+    thermTime = 500
+    nc = numericsChecker(-2, 0, 30, latSize, sweeps, thermTime)
 
     #nc.calibrateDeltas()
     #nc.fitDeltas()
 
     #nc.recordReferenceData()
-    nc.recordSelfMadeData(verbose=True)
+    #nc.recordSelfMadeDataGPU(verbose=True)
     nc.evaluateData()
 
 

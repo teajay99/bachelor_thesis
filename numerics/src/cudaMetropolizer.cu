@@ -37,10 +37,11 @@ __global__ void kernel_probe_site(su2Action<dim> act, su2Element *fields,
   int idx = (threadIdx.x + blockDim.x * blockIdx.x);
   int site = 2 * idx;
   int offset = 0;
-  for (int i = 0; i < act.getDim(); i++) {
+  for (int i = 0; i < dim; i++) {
     offset += site / act.getBasis(i);
   }
-  site += (offset + odd) % 2;
+
+  site += ((offset + odd) % 2);
 
   if (site >= act.getSiteCount()) {
     return;
@@ -48,20 +49,11 @@ __global__ void kernel_probe_site(su2Action<dim> act, su2Element *fields,
 
   int loc = (dim * site) + mu;
   for (int i = 0; i < multiProbe; i++) {
-
-    // Evaluates action "around" link Variable U_mu (site)
-    double oldVal = act.evaluateDelta(fields, site, mu);
-    su2Element oldElement = fields[loc];
-    fields[loc] = oldElement.randomize(delta, &randStates[idx]);
-
-    // Evaluating action with new link Variable
-    double newVal = act.evaluateDelta(fields, site, mu);
-
-    // Deciding wether to keep the new link Variable
-    if ((newVal > oldVal) &&
-        (curand_uniform_double(&randStates[idx]) > exp(-(newVal - oldVal)))) {
-      fields[loc] = oldElement;
-    } else {
+    su2Element newElement = fields[loc].randomize(delta, &randStates[idx]);
+    double change = act.evaluateDelta(fields, newElement, site, mu);
+    if ((change < 0) ||
+        (curand_uniform_double(&randStates[idx]) < exp(-change))) {
+      fields[loc] = newElement;
       hitCounts[idx]++;
     }
   }
@@ -150,8 +142,6 @@ cudaMetropolizer<dim>::cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe,
       ((action.getSiteCount() / 2) + CUDA_BLOCK_SIZE - 1) / CUDA_BLOCK_SIZE;
   multiProbe = iMultiProbe;
 
-  randStateCount = (blockCount + 200 - 1) / 200;
-
   cudaMalloc(&randStates,
              sizeof(CUDA_RAND_STATE_TYPE) * (action.getSiteCount() / 2));
   cudaMalloc(&hitCounts, sizeof(int) * (action.getSiteCount() / 2));
@@ -185,8 +175,8 @@ template <int dim> double cudaMetropolizer<dim>::sweep() {
   double *sumBuffer;
   int *hitBuffer;
 
-  cudaMallocManaged(&sumBuffer, sizeof(double) * CUDA_BLOCK_SIZE);
-  cudaMallocManaged(&hitBuffer, sizeof(int) * CUDA_BLOCK_SIZE);
+  cudaMalloc(&sumBuffer, sizeof(double) * CUDA_BLOCK_SIZE);
+  cudaMalloc(&hitBuffer, sizeof(int) * CUDA_BLOCK_SIZE);
 
   kernel_measurePlaquette<dim><<<1, CUDA_BLOCK_SIZE>>>(
       sumBuffer, hitBuffer, fields, hitCounts, action, sitesPerThread);

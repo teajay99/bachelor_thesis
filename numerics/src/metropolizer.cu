@@ -1,4 +1,5 @@
 #include "metropolizer.hpp"
+#include <random>
 
 template <int dim>
 metropolizer<dim>::metropolizer(su2Action<dim> iAction, int iMultiProbe,
@@ -27,19 +28,10 @@ template <int dim> double metropolizer<dim>::sweep() {
     for (int mu = 0; mu < dim; mu++) {
       int loc = (dim * site) + mu;
       for (int i = 0; i < multiProbe; i++) {
-        // Evaluates action "around" link Variable U_mu (site)
-        double oldVal = action.evaluateDelta(fields, site, mu);
-        su2Element oldElement = fields[loc];
-        fields[loc] = oldElement.randomize(delta, generator);
-
-        // Evaluating action with new link Variable
-        double newVal = action.evaluateDelta(fields, site, mu);
-
-        // Deciding wether to keep the new link Variable
-        if ((newVal > oldVal) &&
-            (uni_dist(generator) > exp(-(newVal - oldVal)))) {
-          fields[loc] = oldElement;
-        } else {
+        su2Element newElement = fields[loc].randomize(delta,  generator);
+        double change = action.evaluateDelta(fields, newElement, site,mu);
+        if( (change < 0) || (uni_dist(generator) < exp(-change))){
+          fields[loc] = newElement;
           hitCount++;
         }
       }
@@ -60,6 +52,4 @@ template <int dim> double metropolizer<dim>::sweep() {
   return out /= action.getSiteCount() * dim * (dim - 1);
 }
 
-template <int dim> double metropolizer<dim>::getHitRate() {
-  return hitRate;
-}
+template <int dim> double metropolizer<dim>::getHitRate() { return hitRate; }
