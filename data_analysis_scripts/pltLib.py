@@ -209,6 +209,30 @@ def plotFitFunc(func,
             linestyle=linestyle)
 
 
+def plotFunc(func,
+             xMin=-1,
+             xMax=1,
+             resolution=500,
+             label="",
+             clr="r",
+             linestyle="-",
+             log=False):
+    x_fit = np.linspace(xMin, xMax, resolution)
+    if log == True:
+        x_fit = np.logspace(np.log(xMin) / np.log(10),
+                            np.log(xMax) / np.log(10),
+                            resolution,
+                            base=10)
+    y_fit = func(x_fit)
+    ax.plot(x_fit,
+            y_fit,
+            clr,
+            lw=2,
+            label=label,
+            zorder=2,
+            linestyle=linestyle)
+
+
 def plotLine(x, y, label="", clr="k", ls="-", linewidth=1, alpha=1):
     ax.plot(np.array([i for i in x]),
             np.array([i for i in y]),

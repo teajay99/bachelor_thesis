@@ -82,6 +82,11 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+  if(useCuda && (latSize%2)){
+    std::cout << "Cuda Support only works with even lattice sizes" << std::endl;
+    exit(1);
+  }
+
   su2Action<4> action(latSize, beta);
 
   std::ofstream file;

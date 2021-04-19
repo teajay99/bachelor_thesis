@@ -1,3 +1,4 @@
+#include "rapidcsv.h"
 #include "su2Element.hpp"
 #include <fstream>
 
@@ -6,17 +7,11 @@
 
 class discretizer {
 public:
-  discretizer(std::string filename){
-
-  };
+  discretizer(std::string fileName) { N = 0; };
   ~discretizer(){};
 
-  int loadElements(std::string filename, su2Element *elements,
+  int loadElements(std::string fileName, su2Element *elements,
                    double *distances) {
-    std::ifstream myFile(filename);
-    if (!myFile.is_open()) {
-      return -1;
-    }
 
     for (int j = 0; j < N; j++) {
       for (int i = 0; i < j; i++) {
@@ -49,6 +44,9 @@ public:
     return k;
   };
 
+  int loadElementCount(std::string fileName) {
+    rapidcsv::Document doc("", rapidcsv::SeparatorParams("\t"));
+  };
   int getElementCount() { return N; };
   int getDistanceCount() { return (N * (N - 1)) / 2; };
 
