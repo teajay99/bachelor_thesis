@@ -168,8 +168,8 @@ def plot1DErrPoints(x, y, label="", clr='k'):
                 label=label)
 
 
-def plotPoints(x, y, label="", clr='k'):
-    ax.scatter(x, y, label=label, color=clr)
+def plotPoints(x, y, label="", clr='k',marker="+"):
+    ax.scatter(x, y, label=label, color=clr,marker=marker)
 
 
 def plotImage(img, pixel_length, cmap='jet', cbarlbl=None):

@@ -1,6 +1,7 @@
 #include "cudaMetropolizer.hpp"
-#include <cuda_profiler_api.h>
+#include "discretizer.hpp"
 
+#include <cuda_profiler_api.h>
 #include <curand_mtgp32_host.h>
 #include <curand_mtgp32dc_p_11213.h>
 
@@ -29,10 +30,10 @@ void checkCudaErrors(int i) {
 }
 
 template <int dim>
-__global__ void kernel_probe_site(su2Action<dim> act, su2Element *fields,
-                                  CUDA_RAND_STATE_TYPE *randStates,
-                                  int *hitCounts, int multiProbe, double delta,
-                                  int odd, int mu) {
+__global__ void kernel_probeSite(su2Action<dim> act, su2Element *fields,
+                                 CUDA_RAND_STATE_TYPE *randStates,
+                                 int *hitCounts, int multiProbe, double delta,
+                                 int odd, int mu) {
 
   int idx = (threadIdx.x + blockDim.x * blockIdx.x);
   int site = 2 * idx;
@@ -58,6 +59,39 @@ __global__ void kernel_probe_site(su2Action<dim> act, su2Element *fields,
     }
   }
   fields[loc].renormalize();
+}
+
+template <int dim>
+__global__ void kernel_partProbeSite(su2Action<dim> act, su2Element *fields,
+                                     CUDA_RAND_STATE_TYPE *randStates,
+                                     int *hitCounts, int multiProbe,
+                                     double delta, int odd, int mu,
+                                     su2Element *parts, int partCount) {
+
+  int idx = (threadIdx.x + blockDim.x * blockIdx.x);
+  int site = 2 * idx;
+  int offset = 0;
+  for (int i = 0; i < dim; i++) {
+    offset += site / act.getBasis(i);
+  }
+
+  site += ((offset + odd) % 2);
+
+  if (site >= act.getSiteCount()) {
+    return;
+  }
+
+  int loc = (dim * site) + mu;
+  for (int i = 0; i < multiProbe; i++) {
+    su2Element newElement =
+        fields[loc].partRandomize(&randStates[idx], parts, partCount);
+    double change = act.evaluateDelta(fields, newElement, site, mu);
+    if ((change < 0) ||
+        (curand_uniform_double(&randStates[idx]) < exp(-change))) {
+      fields[loc] = newElement;
+      hitCounts[idx]++;
+    }
+  }
 }
 
 template <int dim>
@@ -133,6 +167,20 @@ __global__ void kernel_initFieldsHot(CUDA_RAND_STATE_TYPE *states,
   }
 }
 
+__global__ void kernel_partInitFieldsHot(CUDA_RAND_STATE_TYPE *states,
+                                         su2Element *fields, int dim, int nMax,
+                                         su2Element *parts, int partCount) {
+  int idx = threadIdx.x + blockDim.x * blockIdx.x;
+  if ((2 * idx) < nMax) {
+    for (int mu = 0; mu < dim; mu++) {
+      for (int i = 0; i < 2; i++) {
+        int loc = (dim * ((2 * idx) + i)) + mu;
+        fields[loc] = fields[loc].partRandomize(&states[idx], parts, partCount);
+      }
+    }
+  }
+}
+
 template <int dim>
 cudaMetropolizer<dim>::cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe,
                                         double iDelta, bool cold)
@@ -142,6 +190,10 @@ cudaMetropolizer<dim>::cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe,
       ((action.getSiteCount() / 2) + CUDA_BLOCK_SIZE - 1) / CUDA_BLOCK_SIZE;
   multiProbe = iMultiProbe;
 
+  // Partition Stuff will remain unused
+  parts = NULL;
+  partCount = 0;
+
   cudaMalloc(&randStates,
              sizeof(CUDA_RAND_STATE_TYPE) * (action.getSiteCount() / 2));
   cudaMalloc(&hitCounts, sizeof(int) * (action.getSiteCount() / 2));
@@ -150,26 +202,71 @@ cudaMetropolizer<dim>::cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe,
   kernel_initIteration<<<blockCount, CUDA_BLOCK_SIZE>>>(
       randStates, fields, hitCounts, action.getSiteCount(), dim);
 
-  kernel_initFieldsHot<<<blockCount, CUDA_BLOCK_SIZE>>>(randStates, fields, dim,
-                                                        action.getSiteCount());
+  if (!cold) {
+    kernel_initFieldsHot<<<blockCount, CUDA_BLOCK_SIZE>>>(
+        randStates, fields, dim, action.getSiteCount());
+  }
   checkCudaErrors(2);
 }
+
+template <int dim>
+cudaMetropolizer<dim>::cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe,
+                                        double iDelta, bool cold,
+                                        std::string partFile)
+    : cudaMetropolizer(iAction, iMultiProbe, iDelta, true) {
+
+  discretizer disc(partFile);
+  partCount = disc.getElementCount();
+  if(partCount == 0){
+    std::cerr << "Partition file '" << partFile << "' could not be read" << std::endl; 
+    exit(1);
+  }
+  su2Element tmpParts[partCount];
+  disc.loadElements(partFile, &tmpParts[0]);
+
+  cudaMalloc(&parts, sizeof(su2Element) * partCount);
+  cudaMemcpy(parts, &tmpParts[0], sizeof(su2Element) * partCount,
+             cudaMemcpyHostToDevice);
+
+  if (!cold) {
+    kernel_partInitFieldsHot<<<blockCount, CUDA_BLOCK_SIZE>>>(
+        randStates, fields, dim, action.getSiteCount(), parts, partCount);
+  }
+};
 
 template <int dim> cudaMetropolizer<dim>::~cudaMetropolizer() {
   cudaFree(randStates);
   cudaFree(fields);
   cudaFree(hitCounts);
+  cudaFree(parts);
 }
 
 template <int dim> double cudaMetropolizer<dim>::sweep() {
   for (int odd = 0; odd < 2; odd++) {
     for (int mu = 0; mu < dim; mu++) {
       checkCudaErrors(3);
-      kernel_probe_site<<<blockCount, CUDA_BLOCK_SIZE>>>(
+      kernel_probeSite<<<blockCount, CUDA_BLOCK_SIZE>>>(
           action, fields, randStates, hitCounts, multiProbe, delta, odd, mu);
       checkCudaErrors(1);
     }
   }
+  return this->measurePlaquette();
+}
+
+template <int dim> double cudaMetropolizer<dim>::partSweep() {
+  for (int odd = 0; odd < 2; odd++) {
+    for (int mu = 0; mu < dim; mu++) {
+      checkCudaErrors(5);
+      kernel_partProbeSite<<<blockCount, CUDA_BLOCK_SIZE>>>(
+          action, fields, randStates, hitCounts, multiProbe, delta, odd, mu,
+          parts, partCount);
+      checkCudaErrors(6);
+    }
+  }
+  return this->measurePlaquette();
+}
+
+template <int dim> double cudaMetropolizer<dim>::measurePlaquette() {
   int sitesPerThread =
       (action.getSiteCount() + CUDA_BLOCK_SIZE - 1) / CUDA_BLOCK_SIZE;
   double *sumBuffer;

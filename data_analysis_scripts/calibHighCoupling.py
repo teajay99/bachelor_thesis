@@ -13,18 +13,24 @@ WORK_DIR = "tmpData/calibHighCoupling"
 def main():
     ex = executor.executor(8)
 
-    latSize = 4
-    sweeps = 10000
+    latSize = 8
+    #Sweeps for Reference, GPU will use 5*sweeps
+    sweeps = 1500
     thermTime = 500
-    betas = helpers.getRoundedLogSpace(0.01, 1, 25)
-    deltas = helpers.getDeltas(0.2)
+    betas = helpers.getRoundedLogSpace(0.05, 1, 24)
+    deltas = helpers.getDeltas(betas)
 
-    # ex.recordGPUData(latSize, betas, deltas, sweeps, WORK_DIR + "/gpu_data")
-    ex.recordReferenceData(latSize, betas, deltas, sweeps // 5,
-                           WORK_DIR + "/ref_data")
-    # ex.runEvaluator(WORK_DIR + "/gpu_data", WORK_DIR + "/data.csv", thermTime)
-    ex.runEvaluator(WORK_DIR + "/ref_data", WORK_DIR + "/ref_data.csv",
-                    thermTime)
+    collectData = False
+
+    if collectData:
+        ex.recordReferenceData(latSize, betas, deltas, sweeps,
+                               WORK_DIR + "/ref_data")
+        ex.runEvaluator(WORK_DIR + "/ref_data", WORK_DIR + "/ref_data.csv",
+                        thermTime)
+
+        ex.recordGPUData(latSize, betas, deltas, 4*sweeps, WORK_DIR + "/gpu_data")
+
+        ex.runEvaluator(WORK_DIR + "/gpu_data", WORK_DIR + "/data.csv", thermTime)
 
     data = np.loadtxt(WORK_DIR + "/data.csv", dtype=np.float64)
     refData = np.loadtxt(WORK_DIR + "/ref_data.csv", dtype=np.float64)
@@ -32,7 +38,7 @@ def main():
     plaquettes = np.array(
         [ufloat(data[i, 1], data[i, 2]) for i in range(len(data[:, 0]))])
     refPlaquettes = np.array([
-        ufloat(refData[i, 1], refData[i, 2]) for i in range(len(refData[:, 0]))
+     ufloat(refData[i, 1], refData[i, 2]) for i in range(len(refData[:, 0]))
     ])
 
     pltLib.startNewPlot("$\\beta$",
@@ -44,7 +50,7 @@ def main():
                            label="Reference Data",
                            clr="r")
     pltLib.plotFunc(helpers.highCouplingExp,
-                    0.008,
+                    0.05,
                     0.83,
                     log=True,
                     label="High Coupling Expansion")

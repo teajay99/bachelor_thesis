@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+import numpy as np
+from uncertainties import ufloat
+from partitions import fibonacci
+
+import executor
+import pltLib
+import helpers
+
+WORK_DIR = "tmpData/partBeta"
+
+clrList = ["r", "b", "g", "c", "m","y"]
+
+
+def main():
+    ex = executor.executor(8)
+
+    latSize = 4
+    sweeps = 2000
+    thermTime = 500
+    betas = helpers.getRoundedLogSpace(0.001, 10, 50)
+    deltas = helpers.getDeltas(betas)
+
+    collectData = False
+
+    parts = [50, 100, 500, 1000, 5000]
+
+    print("""
+===================================
+      Generating Partitions
+===================================
+""")
+
+    for i in range(len(parts)):
+
+        fibonacci.generateLattice(parts[i],
+                                  WORK_DIR + "/partition{}.csv".format(i))
+
+    print("""
+===================================
+     Collecting Reference Data
+===================================
+""")
+    if collectData:
+        ex.recordGPUData(latSize, betas, deltas, 2 * sweeps,
+                         WORK_DIR + "/cont_data")
+        ex.runEvaluator(WORK_DIR + "/cont_data", WORK_DIR + "/cont_data.csv",
+                        thermTime)
+
+    for i in range(len(parts)):
+        print("""
+===================================
+  Collecting Partition Data {}/{}
+===================================
+        """.format(i + 1, len(parts)))
+        if collectData:
+            ex.recordGPUData(latSize,
+                             betas,
+                             deltas,
+                             sweeps,
+                             WORK_DIR + "/part{}_data".format(i),
+                             partition=WORK_DIR + "/partition{}.csv".format(i))
+            ex.runEvaluator(WORK_DIR + "/part{}_data".format(i),
+                            WORK_DIR + "/part{}_data.csv".format(i), thermTime)
+
+    contData = np.loadtxt(WORK_DIR + "/cont_data.csv", dtype=np.float64)
+
+    partPlaquettes = []
+    for i in range(len(parts)):
+        data = np.loadtxt(WORK_DIR + "/part{}_data.csv".format(i),
+                          dtype=np.float64)
+        partPlaquettes.append(
+            [ufloat(data[i, 1], data[i, 2]) for i in range(len(data[:, 0]))])
+
+    contPlaquettes = np.array([
+        ufloat(contData[i, 1], contData[i, 2])
+        for i in range(len(contData[:, 0]))
+    ])
+
+    pltLib.startNewPlot("$\\beta$", "$W_{\\textrm{meas}}(1,1)$", "")
+    pltLib.setLogScale(True, False)
+    pltLib.plot1DErrPoints(betas, contPlaquettes, label="continous")
+
+    for i in range(len(parts)):
+        pltLib.plot1DErrPoints(betas,
+                               partPlaquettes[i],
+                               label="$N = {}$".format(parts[i]),
+                               clr=clrList[i])
+
+    pltLib.export("export/partBeta.pgf")
+    pltLib.endPlot()
+
+
+if __name__ == "__main__":
+    main()

@@ -9,10 +9,14 @@ template <int dim> class cudaMetropolizer {
 public:
   cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
                    bool cold);
+  cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
+                   bool cold, std::string partFile);
   ~cudaMetropolizer();
 
   double sweep();
-  void measurePlaquette();
+  double partSweep();
+
+  double measurePlaquette();
   double getHitRate();
 
 private:
@@ -26,6 +30,10 @@ private:
   int randStateCount;
   CUDA_RAND_STATE_TYPE *randStates;
   su2Element *fields;
+
+  //Partition stuff
+  su2Element *parts;
+  int partCount;
 };
 
 // template class cudaMetropolizer<2>;

@@ -31,24 +31,29 @@ class executor:
                       deltas,
                       sweeps,
                       dataDir,
-                      verbose=True):
+                      verbose=True,
+                      partition=None):
 
-        latSize, betas, deltas, sweeps = self.fixParameters(
-            [latSize, betas, deltas, sweeps])
+        latSize, betas, deltas, sweeps, partition = self.fixParameters(
+            [latSize, betas, deltas, sweeps, partition])
 
         if os.path.exists(dataDir):
             shutil.rmtree(dataDir)
 
         pathlib.Path(dataDir).mkdir(exist_ok=True, parents=True)
         for i in range(len(betas)):
-            subprocess.check_call([
+            callList = [
                 "./../numerics/main", "--cuda", "-m",
                 str(sweeps[i]), "-b",
                 str(betas[i]), "-d",
                 str(deltas[i]), "-l",
                 str(latSize[i]), "-o", dataDir + "/data-{}.csv".format(i)
-            ],
-                                  stdout=subprocess.DEVNULL)
+            ]
+            if partition[i] != None:
+                callList.append("-p")
+                callList.append(partition[i])
+
+            subprocess.check_call(callList, stdout=subprocess.DEVNULL)
             if verbose:
                 print("Collecting GPU Dataset ({}/{}).".format(
                     i + 1, len(betas)))
@@ -59,10 +64,11 @@ class executor:
                       deltas,
                       sweeps,
                       dataDir,
-                      verbose=True):
+                      verbose=True,
+                      partition=None):
 
-        latSize, betas, deltas, sweeps = self.fixParameters(
-            [latSize, betas, deltas, sweeps])
+        latSize, betas, deltas, sweeps, partition = self.fixParameters(
+            [latSize, betas, deltas, sweeps, partition])
 
         if os.path.exists(dataDir):
             shutil.rmtree(dataDir)
@@ -74,16 +80,22 @@ class executor:
             for t in range(self.threads):
                 i = (j * self.threads) + t
                 if i < len(betas):
+
+                    callList = [
+                        "./../numerics/main", "-m",
+                        str(sweeps[i]), "-b",
+                        str(betas[i]), "-d",
+                        str(deltas[i]), "-l",
+                        str(latSize[i]), "-o",
+                        dataDir + "/data-{}.csv".format(i)
+                    ]
+
+                    if partition[i] != None:
+                        callList.append("-p")
+                        callList.append(partition[i])
+
                     prcs.append(
-                        subprocess.Popen([
-                            "./../numerics/main", "-m",
-                            str(sweeps[i]), "-b",
-                            str(betas[i]), "-d",
-                            str(deltas[i]), "-l",
-                            str(latSize[i]), "-o",
-                            dataDir + "/data-{}.csv".format(i)
-                        ],
-                                         stdout=subprocess.DEVNULL))
+                        subprocess.Popen(callList, stdout=subprocess.DEVNULL))
             for t in range(self.threads):
                 i = (j * self.threads) + t
                 if i < len(betas):
@@ -117,7 +129,7 @@ class executor:
                                  str(i)).mkdir(exist_ok=True)
                     prcs.append(
                         subprocess.Popen([
-                            "./../../../../su2/su2-metropolis", "-X",
+                            "/home/timo/Dropbox/Dokumente/Studium/Bachelorarbeit/git/su2/su2-metropolis", "-X",
                             str(latSize[i]), "-Y",
                             str(latSize[i]), "-Z",
                             str(latSize[i]), "-T",

@@ -27,7 +27,10 @@ cxxopts::Options getOptions() {
       "o,output", "Output File Name",
       cxxopts::value<std::string>()->default_value("data.csv"))(
       "m,measurements", "Number of Sweeps",
-      cxxopts::value<int>()->default_value("1000"))("c,cold", "Cold Start")(
+      cxxopts::value<int>()->default_value("1000"))(
+      "p,partition",
+      "Use partitioned Version of su2 stored as a tab seperated csv file",
+      cxxopts::value<std::string>())("c,cold", "Cold Start")(
       "v,verbose", "Verbose output",
       cxxopts::value<bool>()->default_value("false"));
 
@@ -53,6 +56,8 @@ int main(int argc, char **argv) {
   int multiProbe = 0;
   std::string fName;
   double delta = 0;
+  bool usePartition = false;
+  std::string partName;
   try {
 
     auto result = options.parse(argc, argv);
@@ -69,6 +74,11 @@ int main(int argc, char **argv) {
       useCuda = true;
     }
 
+    if (result.count("partition")) {
+      usePartition = true;
+      partName = result["partition"].as<std::string>();
+    }
+
     beta = result["beta"].as<double>();
     latSize = result["lattice-size"].as<int>();
     measurements = result["measurements"].as<int>();
@@ -82,7 +92,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  if(useCuda && (latSize%2)){
+  if (useCuda && (latSize % 2)) {
     std::cout << "Cuda Support only works with even lattice sizes" << std::endl;
     exit(1);
   }
@@ -92,10 +102,18 @@ int main(int argc, char **argv) {
   std::ofstream file;
   file.open(fName);
   if (useCuda) {
-    cudaMetropolizer<4> metro(action, multiProbe, delta, cold);
-    for (int i = 0; i < measurements; i++) {
-      double plaquette = metro.sweep();
-      logResults(i, file, plaquette, metro.getHitRate());
+    if (usePartition) {
+      cudaMetropolizer<4> metro(action, multiProbe, delta, cold, partName);
+      for(int i = 0; i< measurements; i++){
+        double plaquette = metro.partSweep();
+        logResults(i, file, plaquette, metro.getHitRate());
+      }
+    } else {
+      cudaMetropolizer<4> metro(action, multiProbe, delta, cold);
+      for (int i = 0; i < measurements; i++) {
+        double plaquette = metro.sweep();
+        logResults(i, file, plaquette, metro.getHitRate());
+      }
     }
   } else {
     metropolizer<4> metro(action, multiProbe, delta, cold);

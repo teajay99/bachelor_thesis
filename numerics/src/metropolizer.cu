@@ -12,7 +12,11 @@ metropolizer<dim>::metropolizer(su2Action<dim> iAction, int iMultiProbe,
 
   for (int i = 0; i < action.getSiteCount() * dim; i++) {
     fields[i] = su2Element();
-    fields[i].randomize(1, generator);
+  }
+  if (!cold) {
+    for (int i = 0; i < action.getSiteCount() * dim; i++) {
+      fields[i].randomize(1, generator);
+    }
   }
 }
 
@@ -28,9 +32,9 @@ template <int dim> double metropolizer<dim>::sweep() {
     for (int mu = 0; mu < dim; mu++) {
       int loc = (dim * site) + mu;
       for (int i = 0; i < multiProbe; i++) {
-        su2Element newElement = fields[loc].randomize(delta,  generator);
-        double change = action.evaluateDelta(fields, newElement, site,mu);
-        if( (change < 0) || (uni_dist(generator) < exp(-change))){
+        su2Element newElement = fields[loc].randomize(delta, generator);
+        double change = action.evaluateDelta(fields, newElement, site, mu);
+        if ((change < 0) || (uni_dist(generator) < exp(-change))) {
           fields[loc] = newElement;
           hitCount++;
         }

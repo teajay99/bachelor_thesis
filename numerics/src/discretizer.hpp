@@ -7,12 +7,22 @@
 
 class discretizer {
 public:
-  discretizer(std::string fileName) { N = 0; };
+  discretizer(std::string fileName) { this->loadElementCount(fileName); };
   ~discretizer(){};
 
-  int loadElements(std::string fileName, su2Element *elements,
-                   double *distances) {
+  void loadElements(std::string fileName, su2Element *elements) {
+    rapidcsv::Document doc(fileName, rapidcsv::LabelParams(-1, -1),
+                           rapidcsv::SeparatorParams('\t'));
+    for (int i = 0; i < N; i++) {
+      double el[4];
+      for (int j = 0; j < 4; j++) {
+        el[j] = doc.GetCell<double>(j, i);
+      }
+      elements[i] = su2Element(&el[0]);
+    }
+  };
 
+  void loadDistances(su2Element *elements, double *distances) {
     for (int j = 0; j < N; j++) {
       for (int i = 0; i < j; i++) {
         double sum = 0;
@@ -22,9 +32,7 @@ public:
         distances[getDistIndex(i, j)] = acos(sum);
       }
     }
-
-    return 0;
-  };
+  }
 
   double getDistance(double *distances, int i, int j) {
 
@@ -44,8 +52,10 @@ public:
     return k;
   };
 
-  int loadElementCount(std::string fileName) {
-    rapidcsv::Document doc("", rapidcsv::SeparatorParams("\t"));
+  void loadElementCount(std::string fileName) {
+    rapidcsv::Document doc(fileName, rapidcsv::LabelParams(-1, -1),
+                           rapidcsv::SeparatorParams('\t'));
+    N = doc.GetRowCount();
   };
   int getElementCount() { return N; };
   int getDistanceCount() { return (N * (N - 1)) / 2; };
