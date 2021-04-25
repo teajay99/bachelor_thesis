@@ -9,7 +9,7 @@ import executor
 import pltLib
 import helpers
 
-WORK_DIR = "tmpData/partBeta"
+WORK_DIR = "tmpData/partIcoBeta"
 
 clrList = ["r", "b", "g", "p", "o"]
 
@@ -18,9 +18,9 @@ def main():
     ex = executor.executor(8)
 
     latSize = 4
-    sweeps = 1000
+    sweeps = 1500
     thermTime = 500
-    betas = helpers.getRoundedLogSpace(0.001, 10, 50)
+    betas = helpers.getRoundedLogSpace(0.025, 25, 50)
     deltas = helpers.getDeltas(betas)
 
     collectData = False
@@ -90,7 +90,7 @@ def main():
                                label="$N = {}$".format(parts[i]),
                                clr=clrList[i])
 
-    pltLib.export("export/partBeta.pgf")
+    pltLib.export("export/partIcoBeta.pgf")
     pltLib.endPlot()
 
 

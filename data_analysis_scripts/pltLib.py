@@ -136,9 +136,9 @@ def plotErrPointsAbs(x, y, xNoise, yNoise, label="", clr='k'):
                 fmt='k.',
                 markersize=0,
                 ecolor=clr,
-                elinewidth=0.8,
-                capsize=2.5,
-                capthick=0.8,
+                elinewidth=0.5,
+                capsize=2,
+                capthick=0.5,
                 barsabove=True,
                 label=label)
 
@@ -161,15 +161,15 @@ def plot1DErrPoints(x, y, label="", clr='k'):
                 marker="_",
                 ecolor=clr,
                 mec=clr,
-                elinewidth=0.8,
-                capsize=2.5,
-                capthick=0.8,
+                elinewidth=0.5,
+                capsize=2,
+                capthick=0.5,
                 barsabove=True,
                 label=label)
 
 
 def plotPoints(x, y, label="", clr='k',marker="+"):
-    ax.scatter(x, y, label=label, color=clr,marker=marker)
+    ax.scatter(x, y, label=label, color=clr,marker=marker,s=20)
 
 
 def plotImage(img, pixel_length, cmap='jet', cbarlbl=None):
@@ -203,7 +203,7 @@ def plotFitFunc(func,
     ax.plot(x_fit,
             y_fit,
             clr,
-            lw=2,
+            lw=1,
             label=label,
             zorder=2,
             linestyle=linestyle)
@@ -227,7 +227,7 @@ def plotFunc(func,
     ax.plot(x_fit,
             y_fit,
             clr,
-            lw=2,
+            lw=1,
             label=label,
             zorder=2,
             linestyle=linestyle)
