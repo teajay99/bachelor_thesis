@@ -4,16 +4,18 @@
 #include "config.hpp"
 #include "su2Action.hpp"
 #include "su2Element.hpp"
+#include "su2IkoElement.hpp"
 
-template <int dim> class cudaMetropolizer {
+template <int dim, class su2Type> class cudaMetropolizer {
 public:
   cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
-                   bool cold);
-  cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
-                   bool cold, std::string partFile);
+                   su2Type *fields);
+  // cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
+  //                  bool cold, std::string partFile);
   ~cudaMetropolizer();
 
   double sweep();
+
   double partSweep();
 
   double measurePlaquette();
@@ -29,16 +31,13 @@ private:
   su2Action<dim> action;
   int randStateCount;
   CUDA_RAND_STATE_TYPE *randStates;
-  su2Element *fields;
-
-  //Partition stuff
-  su2Element *parts;
-  int partCount;
+  su2Type *fields;
 };
 
 // template class cudaMetropolizer<2>;
 // template class cudaMetropolizer<3>;
-template class cudaMetropolizer<4>;
+template class cudaMetropolizer<4, su2Element>;
+template class cudaMetropolizer<4, su2IkoElement>;
 // template class cudaMetropolizer<5>;
 // template class cudaMetropolizer<6>;
 // template class cudaMetropolizer<7>;

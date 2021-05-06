@@ -8,7 +8,7 @@ template <int dim> class su2Action {
 public:
   // Constructor for storing site count and Beta, as well as calculate derived
   // quantities
-  __device__ __host__ su2Action(int iLatSize, double iBeta) {
+  su2Action(int iLatSize, double iBeta) {
     latSize = iLatSize;
     siteCount = intPow(latSize, dim);
     for (int i = 0; i < dim; i++) {

@@ -43,6 +43,16 @@ def main():
         ufloat(refData[i, 1], refData[i, 2]) for i in range(len(refData[:, 0]))
     ])
 
+
+    pltLib.printTeXTable(
+        np.array([
+            betas, plaquettes, refPlaquettes,
+            np.array([
+                "{0:.6f}".format(i)
+                for i in (helpers.weakCouplingExp6(betas))
+            ])
+        ]).transpose())
+
     pltLib.startNewPlot("$\\beta$", "$W(1,1)$", "")
     pltLib.setLogScale(True, False)
     pltLib.plot1DErrPoints(1/betas,

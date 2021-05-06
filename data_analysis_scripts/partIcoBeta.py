@@ -47,7 +47,7 @@ def main():
         ex.recordGPUData(latSize, betas, deltas, 2 * sweeps,
                          WORK_DIR + "/cont_data")
         ex.runEvaluator(WORK_DIR + "/cont_data", WORK_DIR + "/cont_data.csv",
-                    thermTime)
+                        thermTime)
 
     for i in range(len(parts)):
         print("""
@@ -63,7 +63,7 @@ def main():
                              WORK_DIR + "/part{}_data".format(i),
                              partition=WORK_DIR + "/partition{}.csv".format(i))
             ex.runEvaluator(WORK_DIR + "/part{}_data".format(i),
-                        WORK_DIR + "/part{}_data.csv".format(i), thermTime)
+                            WORK_DIR + "/part{}_data.csv".format(i), thermTime)
 
     contData = np.loadtxt(WORK_DIR + "/cont_data.csv", dtype=np.float64)
 
@@ -79,18 +79,27 @@ def main():
         for i in range(len(contData[:, 0]))
     ])
 
-    pltLib.startNewPlot("$\\beta$",
-                        "$W_{\\textrm{meas}}(1,1)$", "")
+    texTable = [betas, contPlaquettes]
+    for i in range(len(parts)):
+        texTable.append(partPlaquettes[i])
+
+    pltLib.printTeXTable(np.array(texTable).transpose())
+
+    pltLib.startNewPlot("$\\beta$", "$W(1,1)$", "")
     pltLib.setLogScale(True, False)
-    pltLib.plot1DErrPoints(betas, contPlaquettes, label="continous")
+    pltLib.plot1DErrPoints(betas,
+                           contPlaquettes,
+                           label="continous (" +
+                           str((2 * sweeps) - thermTime) + " sweeps)")
 
     for i in range(len(parts)):
         pltLib.plot1DErrPoints(betas,
                                partPlaquettes[i],
-                               label="$N = {}$".format(parts[i]),
+                               label="Ikosaeder (" + str(sweeps - thermTime) +
+                               " sweeps)",
                                clr=clrList[i])
 
-    pltLib.export("export/partIcoBeta.pgf")
+    pltLib.export("export/partIcoBeta.pgf",width = 0.8)
     pltLib.endPlot()
 
 

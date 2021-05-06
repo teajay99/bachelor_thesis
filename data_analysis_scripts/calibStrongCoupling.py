@@ -43,6 +43,15 @@ def main():
         ufloat(refData[i, 1], refData[i, 2]) for i in range(len(refData[:, 0]))
     ])
 
+    pltLib.printTeXTable(
+        np.array([
+            betas, plaquettes, refPlaquettes,
+            np.array([
+                "{0:.5f}".format(i)
+                for i in (helpers.strongCouplingExp(betas) + betas / 4)
+            ])
+        ]).transpose())
+
     pltLib.startNewPlot("$\\beta$", "$W(1,1) - \\frac{\\beta}{4}$", "")
     pltLib.setLogScale(True, False)
     pltLib.plot1DErrPoints(betas,

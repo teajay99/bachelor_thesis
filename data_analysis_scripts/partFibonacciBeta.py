@@ -10,7 +10,7 @@ import helpers
 
 WORK_DIR = "tmpData/partFibonacciBeta"
 
-clrList = ["r", "b", "g", "c", "m","y"]
+clrList = ["r", "b", "g", "c", "m", "y"]
 
 
 def main():
@@ -33,9 +33,9 @@ def main():
 """)
 
     for i in range(len(parts)):
-
-        fibonacci.generateLattice(parts[i],
-                                  WORK_DIR + "/partition{}.csv".format(i))
+        if collectData:
+            fibonacci.generateLattice(parts[i],
+                                      WORK_DIR + "/partition{}.csv".format(i))
 
     print("""
 ===================================
@@ -78,17 +78,27 @@ def main():
         for i in range(len(contData[:, 0]))
     ])
 
-    pltLib.startNewPlot("$\\beta$", "$W_{\\textrm{meas}}(1,1)$", "")
+    texTable = [betas, contPlaquettes]
+    for i in range(len(parts)):
+        texTable.append(partPlaquettes[i])
+
+    pltLib.printTeXTable(np.array(texTable).transpose())
+
+    pltLib.startNewPlot("$\\beta$", "$W(1,1)$", "")
     pltLib.setLogScale(True, False)
-    pltLib.plot1DErrPoints(betas, contPlaquettes, label="continous")
+    pltLib.plot1DErrPoints(betas,
+                           contPlaquettes,
+                           label="continous (" +
+                           str((2 * sweeps) - thermTime) + " sw.)")
 
     for i in range(len(parts)):
         pltLib.plot1DErrPoints(betas,
                                partPlaquettes[i],
-                               label="$N = {}$".format(parts[i]),
+                               label="$N = {}$ (".format(parts[i]) +
+                               str(sweeps - thermTime) + " sw.)",
                                clr=clrList[i])
 
-    pltLib.export("export/partFibonacciBeta.pgf")
+    pltLib.export("export/partFibonacciBeta.pgf",width=0.8)
     pltLib.endPlot()
 
 

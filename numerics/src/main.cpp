@@ -4,10 +4,9 @@
 #include <iomanip>
 #include <string>
 
-#include "cudaMetropolizer.hpp"
 #include "cxxopts.hpp"
-#include "metropolizer.hpp"
-#include "su2Action.hpp"
+#include "executor.hpp"
+#include "partitions.hpp"
 
 cxxopts::Options getOptions() {
   cxxopts::Options options("SU2-Metropolizer",
@@ -28,21 +27,14 @@ cxxopts::Options getOptions() {
       cxxopts::value<std::string>()->default_value("data.csv"))(
       "m,measurements", "Number of Sweeps",
       cxxopts::value<int>()->default_value("1000"))(
-      "p,partition",
-      "Use partitioned Version of su2 stored as a tab seperated csv file",
+      "partition-iko", "Use The Ikosaeder Subgroup of SU(2) as a gauge group")(
+      "partition-list",
+      "Use custom partition provided by an additional List (.csv) File",
       cxxopts::value<std::string>())("c,cold", "Cold Start")(
       "v,verbose", "Verbose output",
       cxxopts::value<bool>()->default_value("false"));
 
   return options;
-}
-
-void logResults(int i, std::ofstream &file, double plaquette, double hitRate) {
-  std::cout << i << " " << std::scientific << std::setw(18)
-            << std::setprecision(15) << plaquette << " " << hitRate
-            << std::endl;
-  file << i << "\t" << std::scientific << std::setw(18) << std::setprecision(15)
-       << plaquette << "\t" << hitRate << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -56,8 +48,9 @@ int main(int argc, char **argv) {
   int multiProbe = 0;
   std::string fName;
   double delta = 0;
-  bool usePartition = false;
-  std::string partName;
+  int partType = SU2_ELEMENT;
+  std::string partFile = "";
+
   try {
 
     auto result = options.parse(argc, argv);
@@ -74,9 +67,11 @@ int main(int argc, char **argv) {
       useCuda = true;
     }
 
-    if (result.count("partition")) {
-      usePartition = true;
-      partName = result["partition"].as<std::string>();
+    if (result.count("partition-iko")) {
+      partType = SU2_IKO_ELEMENT;
+    } else if (result.count("partition-list")) {
+      partFile = result["partition-list"].as<std::string>();
+      partType = SU2_LIST_ELEMENT;
     }
 
     beta = result["beta"].as<double>();
@@ -97,30 +92,10 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  su2Action<4> action(latSize, beta);
+  // su2Action<4> action(latSize, beta);
 
-  std::ofstream file;
-  file.open(fName);
-  if (useCuda) {
-    if (usePartition) {
-      cudaMetropolizer<4> metro(action, multiProbe, delta, cold, partName);
-      for(int i = 0; i< measurements; i++){
-        double plaquette = metro.partSweep();
-        logResults(i, file, plaquette, metro.getHitRate());
-      }
-    } else {
-      cudaMetropolizer<4> metro(action, multiProbe, delta, cold);
-      for (int i = 0; i < measurements; i++) {
-        double plaquette = metro.sweep();
-        logResults(i, file, plaquette, metro.getHitRate());
-      }
-    }
-  } else {
-    metropolizer<4> metro(action, multiProbe, delta, cold);
-    for (int i = 0; i < measurements; i++) {
-      double plaquette = metro.sweep();
-      logResults(i, file, plaquette, metro.getHitRate());
-    }
-  }
-  file.close();
+  executor<4> exec(latSize, beta, multiProbe, delta, partType, useCuda,
+                   partFile);
+  exec.initFields(cold);
+  exec.run(measurements, fName);
 }
