@@ -32,10 +32,11 @@ class executor:
                       sweeps,
                       dataDir,
                       verbose=True,
-                      partition=None):
+                      partition=None,
+                      partitionFile=None):
 
-        latSize, betas, deltas, sweeps, partition = self.fixParameters(
-            [latSize, betas, deltas, sweeps, partition])
+        latSize, betas, deltas, sweeps, partition, partitionFile = self.fixParameters(
+            [latSize, betas, deltas, sweeps, partition, partitionFile])
 
         if os.path.exists(dataDir):
             shutil.rmtree(dataDir)
@@ -50,8 +51,9 @@ class executor:
                 str(latSize[i]), "-o", dataDir + "/data-{}.csv".format(i)
             ]
             if partition[i] != None:
-                callList.append("-p")
                 callList.append(partition[i])
+                if partitionFile != None:
+                    callList.append(partitionFile[i])
 
             subprocess.check_call(callList, stdout=subprocess.DEVNULL)
             if verbose:
@@ -65,10 +67,11 @@ class executor:
                       sweeps,
                       dataDir,
                       verbose=True,
-                      partition=None):
+                      partition=None,
+                      partitionFile=None):
 
-        latSize, betas, deltas, sweeps, partition = self.fixParameters(
-            [latSize, betas, deltas, sweeps, partition])
+        latSize, betas, deltas, sweeps, partition, partitionFile = self.fixParameters(
+            [latSize, betas, deltas, sweeps, partition, partitionFile])
 
         if os.path.exists(dataDir):
             shutil.rmtree(dataDir)
@@ -91,8 +94,9 @@ class executor:
                     ]
 
                     if partition[i] != None:
-                        callList.append("-p")
                         callList.append(partition[i])
+                        if partitionFile != None:
+                            callList.append(partitionFile[i])
 
                     prcs.append(
                         subprocess.Popen(callList, stdout=subprocess.DEVNULL))
@@ -129,7 +133,8 @@ class executor:
                                  str(i)).mkdir(exist_ok=True)
                     prcs.append(
                         subprocess.Popen([
-                            "/home/timo/Dropbox/Dokumente/Studium/Bachelorarbeit/git/su2/su2-metropolis", "-X",
+                            "/home/timo/Dropbox/Dokumente/Studium/Bachelorarbeit/git/su2/su2-metropolis",
+                            "-X",
                             str(latSize[i]), "-Y",
                             str(latSize[i]), "-Z",
                             str(latSize[i]), "-T",

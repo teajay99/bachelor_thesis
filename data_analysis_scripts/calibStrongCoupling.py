@@ -20,14 +20,16 @@ def main():
     betas = helpers.getRoundedLogSpace(0.02, 2, 24)
     deltas = helpers.getDeltas(betas)
 
-    collectData = False
+    collectData = True
+    collectRefData = False
 
-    if collectData:
+    if collectRefData:
         ex.recordReferenceData(latSize, betas, deltas, sweeps,
                                WORK_DIR + "/ref_data")
         ex.runEvaluator(WORK_DIR + "/ref_data", WORK_DIR + "/ref_data.csv",
                         thermTime)
 
+    if collectData:
         ex.recordGPUData(latSize, betas, deltas, 4 * sweeps,
                          WORK_DIR + "/gpu_data")
 

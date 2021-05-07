@@ -52,7 +52,7 @@ public:
 
   // Evaluate Plaquette Product starting from site, in direction mu and nu
   __device__ __host__ su2Element plaquetteProduct(su2Element *fields, int site,
-                                                  int mu, int nu) {
+                                               int mu, int nu) {
 
     int k0 = (dim * site) + mu;
     int k1 = (dim * getNeighbour(site, mu, 1)) + nu;
