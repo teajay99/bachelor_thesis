@@ -27,7 +27,8 @@ public:
   + mu] (for n sites per dimension)
   */
 
-  __device__ __host__ double evaluateDelta(su2Element *fields, su2Element newU,
+  template <class su2Type>
+  __device__ __host__ double evaluateDelta(su2Type *fields, su2Type newU,
                                            int site, int mu) {
     // return value
     double sum = 0.;
@@ -35,14 +36,14 @@ public:
     for (int i = 0; i < dim; i++) {
       if (i != mu) {
         // Evaluating Upper Plaquette
-        sum -= this->plaquetteProduct(fields, site, mu, i).trace();
+        sum -= this->template plaquetteProduct<su2Type>(fields, site, mu, i).trace();
         sum +=
-            this->newPlaquetteProduct(fields, newU, true, site, mu, i).trace();
+            this->template newPlaquetteProduct<su2Type>(fields, newU, true, site, mu, i).trace();
 
         // Evaluating Lower Plaquette
-        sum -= this->plaquetteProduct(fields, getNeighbour(site, i, -1), mu, i)
+        sum -= this->template plaquetteProduct<su2Type>(fields, getNeighbour(site, i, -1), mu, i)
                    .trace();
-        sum += this->newPlaquetteProduct(fields, newU, false,
+        sum += this->template newPlaquetteProduct<su2Type>(fields, newU, false,
                                          getNeighbour(site, i, -1), mu, i)
                    .trace();
       }
@@ -51,7 +52,8 @@ public:
   };
 
   // Evaluate Plaquette Product starting from site, in direction mu and nu
-  __device__ __host__ su2Element plaquetteProduct(su2Element *fields, int site,
+  template <class su2Type>
+  __device__ __host__ su2Element plaquetteProduct(su2Type *fields, int site,
                                                int mu, int nu) {
 
     int k0 = (dim * site) + mu;
@@ -65,8 +67,9 @@ public:
 
   // Evaluate Plaquette Product starting from site, in direction mu and nu
   // Replacing one with a new element
-  __device__ __host__ su2Element newPlaquetteProduct(su2Element *fields,
-                                                     su2Element newU,
+  template <class su2Type>
+  __device__ __host__ su2Element newPlaquetteProduct(su2Type *fields,
+                                                     su2Type newU,
                                                      bool upper, int site,
                                                      int mu, int nu) {
 

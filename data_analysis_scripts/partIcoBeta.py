@@ -14,92 +14,71 @@ WORK_DIR = "tmpData/partIcoBeta"
 clrList = ["r", "b", "g", "p", "o"]
 
 
-def main():
+def main(collectData=False):
     ex = executor.executor(8)
 
     latSize = 4
-    sweeps = 1500
+    sweeps = 2000
     thermTime = 500
-    betas = helpers.getRoundedLogSpace(0.025, 25, 50)
+    #betas = helpers.getRoundedLogSpace(0.5, 7, 50)
+    betas = np.linspace(4, 7, 301)
     deltas = helpers.getDeltas(betas)
 
-    collectData = False
-
-    parts = [1]
-
-    print("""
-===================================
-      Generating Partitions
-===================================
-""")
-
-    for i in range(len(parts)):
-
-        icosaeder.generateLattice(parts[i],
-                                  WORK_DIR + "/partition{}.csv".format(i))
-
-    print("""
+    if collectData:
+        print("""
 ===================================
      Collecting Reference Data
 ===================================
 """)
-    if collectData:
         ex.recordGPUData(latSize, betas, deltas, 2 * sweeps,
                          WORK_DIR + "/cont_data")
         ex.runEvaluator(WORK_DIR + "/cont_data", WORK_DIR + "/cont_data.csv",
                         thermTime)
-
-    for i in range(len(parts)):
         print("""
 ===================================
-  Collecting Partition Data {}/{}
+    Collecting Partition Data
 ===================================
-        """.format(i + 1, len(parts)))
-        if collectData:
-            ex.recordGPUData(latSize,
-                             betas,
-                             deltas,
-                             sweeps,
-                             WORK_DIR + "/part{}_data".format(i),
-                             partition=WORK_DIR + "/partition{}.csv".format(i))
-            ex.runEvaluator(WORK_DIR + "/part{}_data".format(i),
-                            WORK_DIR + "/part{}_data.csv".format(i), thermTime)
+""")
+        ex.recordGPUData(latSize,
+                         betas,
+                         deltas,
+                         sweeps,
+                         WORK_DIR + "/iko_data",
+                         partition="--partition-iko")
+        ex.runEvaluator(WORK_DIR + "/iko_data", WORK_DIR + "/iko_data.csv",
+                        thermTime)
 
     contData = np.loadtxt(WORK_DIR + "/cont_data.csv", dtype=np.float64)
-
-    partPlaquettes = []
-    for i in range(len(parts)):
-        data = np.loadtxt(WORK_DIR + "/part{}_data.csv".format(i),
-                          dtype=np.float64)
-        partPlaquettes.append(
-            [ufloat(data[i, 1], data[i, 2]) for i in range(len(data[:, 0]))])
+    partData = np.loadtxt(WORK_DIR + "/iko_data.csv", dtype=np.float64)
 
     contPlaquettes = np.array([
         ufloat(contData[i, 1], contData[i, 2])
         for i in range(len(contData[:, 0]))
     ])
 
-    texTable = [betas, contPlaquettes]
-    for i in range(len(parts)):
-        texTable.append(partPlaquettes[i])
+    partPlaquettes = np.array([
+        ufloat(partData[i, 1], partData[i, 2])
+        for i in range(len(partData[:, 0]))
+    ])
+
+    texTable = [betas, contPlaquettes, partPlaquettes]
 
     pltLib.printTeXTable(np.array(texTable).transpose())
 
     pltLib.startNewPlot("$\\beta$", "$W(1,1)$", "")
-    pltLib.setLogScale(True, False)
+    # pltLib.setLogScale(True, False)
     pltLib.plot1DErrPoints(betas,
                            contPlaquettes,
                            label="continous (" +
                            str((2 * sweeps) - thermTime) + " sweeps)")
 
-    for i in range(len(parts)):
-        pltLib.plot1DErrPoints(betas,
-                               partPlaquettes[i],
-                               label="Ikosaeder (" + str(sweeps - thermTime) +
-                               " sweeps)",
-                               clr=clrList[i])
+    pltLib.plot1DErrPoints(betas,
+                           partPlaquettes,
+                           label="Ikosaeder (" + str(sweeps - thermTime) +
+                           " sweeps)",
+                           clr="b")
 
-    pltLib.export("export/partIcoBeta.pgf",width = 0.8)
+    pltLib.export("export/partIcoBeta.pgf", width=0.95)
     pltLib.endPlot()
 
 

@@ -5,6 +5,7 @@
 #include "su2Action.hpp"
 #include "su2Element.hpp"
 #include "su2IkoElement.hpp"
+#include "su2ListElement.hpp"
 
 template <int dim, class su2Type> class cudaMetropolizer {
 public:
@@ -38,6 +39,7 @@ private:
 // template class cudaMetropolizer<3>;
 template class cudaMetropolizer<4, su2Element>;
 template class cudaMetropolizer<4, su2IkoElement>;
+template class cudaMetropolizer<4, su2ListElement>;
 // template class cudaMetropolizer<5>;
 // template class cudaMetropolizer<6>;
 // template class cudaMetropolizer<7>;

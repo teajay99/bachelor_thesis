@@ -1,14 +1,13 @@
 #include "rapidcsv.h"
 #include "su2Element.hpp"
-#include <fstream>
 
 #ifndef DISCRETIZER_HPP
 #define DISCRETIZER_HPP
 
 class discretizer {
 public:
-  discretizer(std::string fileName) { this->loadElementCount(fileName); };
-  ~discretizer(){};
+  __host__ __device__ discretizer() { N = 0; };
+  __host__ __device__ ~discretizer(){};
 
   void loadElements(std::string fileName, su2Element *elements) {
     rapidcsv::Document doc(fileName, rapidcsv::LabelParams(-1, -1),
@@ -29,17 +28,17 @@ public:
         for (int k = 0; k < 4; k++) {
           sum += elements[i][k] * elements[j][k];
         }
-        distances[getDistIndex(i, j)] = acos(sum);
+        distances[getDistIndex(i, j)] = acos(sum) / M_PI;
       }
     }
   }
 
-  double getDistance(double *distances, int i, int j) {
+  __host__ __device__ double getDistance(double *distances, int i, int j) {
 
     return distances[this->getDistIndex(i, j)];
   };
 
-  int getDistIndex(int i, int j) {
+  __host__ __device__ int getDistIndex(int i, int j) {
     if (i == j) {
       return 0;
     } else if (i > j) {
@@ -57,8 +56,8 @@ public:
                            rapidcsv::SeparatorParams('\t'));
     N = doc.GetRowCount();
   };
-  int getElementCount() { return N; };
-  int getDistanceCount() { return (N * (N - 1)) / 2; };
+  __host__ __device__ int getElementCount() { return N; };
+  __host__ __device__ int getDistanceCount() { return (N * (N - 1)) / 2; };
 
 private:
   int N;

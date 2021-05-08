@@ -52,7 +52,7 @@ class executor:
             ]
             if partition[i] != None:
                 callList.append(partition[i])
-                if partitionFile != None:
+                if partitionFile[i] != None:
                     callList.append(partitionFile[i])
 
             subprocess.check_call(callList, stdout=subprocess.DEVNULL)

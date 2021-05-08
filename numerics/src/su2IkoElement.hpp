@@ -9,7 +9,7 @@
 
 class su2IkoElement : public su2Element {
 public:
-  __device__ __host__ su2IkoElement(double *el) : su2Element(el){};
+  __device__ __host__ su2IkoElement() : su2Element(){};
 
   __device__ __host__ su2IkoElement(const su2Element &el) {
     for (int i = 0; i < 4; i++) {
@@ -46,10 +46,11 @@ public:
   };
 
   __device__ su2IkoElement randomize(double delta,
+
                                      CUDA_RAND_STATE_TYPE *state) {
-    int n = 11;
-    while (n == 11) {
-      double t = curand_uniform_double(state) * 11;
+    int n = 12;
+    while (n == 12) {
+      double t = curand_uniform_double(state) * 12;
       n = (int)t;
     }
     return randomize(n);
