@@ -15,9 +15,7 @@ public:
   //                  bool cold, std::string partFile);
   ~cudaMetropolizer();
 
-  double sweep();
-
-  double partSweep();
+  double sweep(int sweeps);
 
   double measurePlaquette();
   double getHitRate();

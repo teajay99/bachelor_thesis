@@ -34,14 +34,15 @@ public:
   }
 
   __host__ __device__ double getDistance(double *distances, int i, int j) {
-
-    return distances[this->getDistIndex(i, j)];
+    if (i == j) {
+      return 0;
+    } else {
+      return distances[this->getDistIndex(i, j)];
+    }
   };
 
   __host__ __device__ int getDistIndex(int i, int j) {
-    if (i == j) {
-      return 0;
-    } else if (i > j) {
+    if (i > j) {
       // Fancy swapping algorithm
       i = i + j;
       j = i - j;

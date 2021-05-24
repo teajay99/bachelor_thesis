@@ -72,21 +72,6 @@ public:
     return this->randomize(alpha, &pnt[0]);
   };
 
-  // __device__ su2Element partRandomize(CUDA_RAND_STATE_TYPE *state,
-  //                                     su2Element *parts, int partCount) {
-  //   int n = partCount;
-  //   while (n == partCount) {
-  //     double t = curand_uniform_double(state) * partCount;
-  //     n = (int)t;
-  //   }
-  //   return partRandomize(n, parts);
-  // };
-  //
-  // __host__ su2Element partRandomize(std::mt19937 &gen, su2Element *parts,
-  //                                   int partCount) {
-  //   std::uniform_int_distribution<> dist(0, partCount - 1);
-  //   return partRandomize(dist(gen), parts);
-  // };
 
   __device__ __host__ void renormalize() {
     double norm = 0;
@@ -120,9 +105,6 @@ protected:
     return su2Element(&coord[0]) * (*this);
   };
 
-  // __device__ __host__ su2Element partRandomize(int n, su2Element *parts) {
-  //   return parts[n];
-  // };
 
   double element[4];
 };

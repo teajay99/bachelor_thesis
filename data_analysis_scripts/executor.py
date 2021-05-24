@@ -33,10 +33,16 @@ class executor:
                       dataDir,
                       verbose=True,
                       partition=None,
-                      partitionFile=None):
+                      partitionFile=None,
+                      hits=None,
+                      multiSweep=None,
+                      cold=False):
 
-        latSize, betas, deltas, sweeps, partition, partitionFile = self.fixParameters(
-            [latSize, betas, deltas, sweeps, partition, partitionFile])
+        latSize, betas, deltas, sweeps, partition, partitionFile, hits, cold, multiSweep = self.fixParameters(
+            [
+                latSize, betas, deltas, sweeps, partition, partitionFile, hits,
+                cold, multiSweep
+            ])
 
         if os.path.exists(dataDir):
             shutil.rmtree(dataDir)
@@ -54,6 +60,14 @@ class executor:
                 callList.append(partition[i])
                 if partitionFile[i] != None:
                     callList.append(partitionFile[i])
+            if hits != None:
+                callList.append("--hits")
+                callList.append(str(hits[i]))
+            if cold[i]:
+                callList.append("-c")
+            if multiSweep != None:
+                callList.append("--multi-sweep")
+                callList.append(str(multiSweep[i]))
 
             subprocess.check_call(callList, stdout=subprocess.DEVNULL)
             if verbose:
@@ -68,10 +82,16 @@ class executor:
                       dataDir,
                       verbose=True,
                       partition=None,
-                      partitionFile=None):
+                      partitionFile=None,
+                      hits=None,
+                      multiSweep=None,
+                      cold=False):
 
-        latSize, betas, deltas, sweeps, partition, partitionFile = self.fixParameters(
-            [latSize, betas, deltas, sweeps, partition, partitionFile])
+        latSize, betas, deltas, sweeps, partition, partitionFile, hits, cold, multiSweep = self.fixParameters(
+            [
+                latSize, betas, deltas, sweeps, partition, partitionFile, hits,
+                cold, multiSweep
+            ])
 
         if os.path.exists(dataDir):
             shutil.rmtree(dataDir)
@@ -97,6 +117,15 @@ class executor:
                         callList.append(partition[i])
                         if partitionFile != None:
                             callList.append(partitionFile[i])
+
+                    if hits != None:
+                        callList.append("--hits")
+                        callList.append(str(hits[i]))
+                    if cold[i]:
+                        callList.append("-c")
+                    if multiSweep != None:
+                        callList.append("--multi-sweep")
+                        callList.append(str(multiSweep[i]))
 
                     prcs.append(
                         subprocess.Popen(callList, stdout=subprocess.DEVNULL))

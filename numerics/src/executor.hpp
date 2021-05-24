@@ -20,11 +20,11 @@ public:
   ~executor();
 
   void initFields(bool cold);
-  void run(int measurements, std::string outFile);
+  void run(int measurements, int multiSweep, std::string outFile);
 
 private:
   template <class su2Type>
-  void runMetropolis(int measurements, std::ofstream &outFile);
+  void runMetropolis(int measurements, int multiSweep, std::ofstream &outFile);
 
   void logResults(int i, double plaquette, double hitRate, std::ofstream &file);
 
@@ -38,7 +38,7 @@ private:
   int partType;
   void *fields;
 
-  //List specific stuff
+  // List specific stuff
   su2Element *elementList;
   double *distList;
 };

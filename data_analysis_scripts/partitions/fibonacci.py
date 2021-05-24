@@ -7,7 +7,7 @@ import mpmath
 
 
 def generateLattice(N, outFile):
-    out = [[0., 0., 0., 0.] for i in range(N)]
+    out = [[0., 0., 0., 0.] for i in range(2 * N)]
 
     def getCartesianCoords(psi, theta, phi):
         return [
@@ -32,11 +32,17 @@ def generateLattice(N, outFile):
         ph = 2 * sp.pi * sp.Mod(n * sp.sqrt(3), 1)
         ph = sp.N(ph, 20)
 
-        out[n - 1] = getCartesianCoords(ps, th, ph)
+        out[2 * (n - 1)] = getCartesianCoords(ps, th, ph)
+        out[2 * (n - 1) + 1] = [
+            getCartesianCoords(ps, th,
+                               ph)[0], -getCartesianCoords(ps, th, ph)[1],
+            -getCartesianCoords(ps, th, ph)[2],
+            -getCartesianCoords(ps, th, ph)[3]
+        ]
 
     file = open(outFile, "w")
 
-    for i in range(N):
+    for i in range(2*N):
         line = "\t".join([str(val) for val in out[i]]) + "\n"
         file.write(line)
 
@@ -44,7 +50,7 @@ def generateLattice(N, outFile):
 
 
 def main():
-    N = 1000
+    N = 500
     generateLattice(N, "../../numerics/testPart.csv")
 
 

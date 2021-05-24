@@ -17,11 +17,11 @@ clrList = ["r", "b", "g", "p", "o"]
 def main(collectData=False):
     ex = executor.executor(8)
 
-    latSize = 4
-    sweeps = 2000
-    thermTime = 500
+    latSize = 16
+    sweeps = 1500
+    thermTime = 1000
     #betas = helpers.getRoundedLogSpace(0.5, 7, 50)
-    betas = np.linspace(4, 7, 301)
+    betas = np.linspace(5, 7, 21)
     deltas = helpers.getDeltas(betas)
 
     if collectData:
@@ -32,8 +32,7 @@ def main(collectData=False):
 """)
         ex.recordGPUData(latSize, betas, deltas, 2 * sweeps,
                          WORK_DIR + "/cont_data")
-        ex.runEvaluator(WORK_DIR + "/cont_data", WORK_DIR + "/cont_data.csv",
-                        thermTime)
+
         print("""
 ===================================
     Collecting Partition Data
@@ -45,7 +44,10 @@ def main(collectData=False):
                          sweeps,
                          WORK_DIR + "/iko_data",
                          partition="--partition-iko")
-        ex.runEvaluator(WORK_DIR + "/iko_data", WORK_DIR + "/iko_data.csv",
+
+    ex.runEvaluator(WORK_DIR + "/cont_data", WORK_DIR + "/cont_data.csv",
+                        thermTime)
+    ex.runEvaluator(WORK_DIR + "/iko_data", WORK_DIR + "/iko_data.csv",
                         thermTime)
 
     contData = np.loadtxt(WORK_DIR + "/cont_data.csv", dtype=np.float64)
@@ -78,7 +80,7 @@ def main(collectData=False):
                            " sweeps)",
                            clr="b")
 
-    pltLib.export("export/partIcoBeta.pgf", width=0.95)
+    pltLib.export("export/partIcoBeta.png", width=2)
     pltLib.endPlot()
 
 

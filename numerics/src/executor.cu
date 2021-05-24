@@ -19,7 +19,7 @@ __global__ void kernel_initFields(su2Type *fields, int nMax, bool cold,
       for (int mu = 0; mu < dim; mu++) {
         int loc = (dim * idx) + mu;
         for (int i = 0; i < iterations; i++) {
-          fields[loc].randomize(1.0, &state);
+          fields[loc] = fields[loc].randomize(1.0, &state);
         }
       }
     }
@@ -45,7 +45,7 @@ __global__ void kernel_initListFields(su2ListElement *fields, int nMax,
     if (!cold) {
       for (int mu = 0; mu < dim; mu++) {
         int loc = (dim * idx) + mu;
-        fields[loc].randomize(1.0, &state);
+        fields[loc] = fields[loc].randomize(1.0, &state);
       }
     }
   }
@@ -115,20 +115,20 @@ template <int dim> void executor<dim>::initFields(bool cold) {
   }
 }
 template <int dim>
-void executor<dim>::run(int measurements, std::string outFile) {
+void executor<dim>::run(int measurements, int multiSweep, std::string outFile) {
   std::ofstream file;
   file.open(outFile);
 
   switch (partType) {
   case SU2_ELEMENT:
-    this->runMetropolis<su2Element>(measurements, file);
+    this->runMetropolis<su2Element>(measurements, multiSweep, file);
     break;
   case SU2_IKO_ELEMENT:
-    this->runMetropolis<su2IkoElement>(measurements, file);
+    this->runMetropolis<su2IkoElement>(measurements, multiSweep, file);
     break;
 
   case SU2_LIST_ELEMENT:
-    this->runMetropolis<su2ListElement>(measurements, file);
+    this->runMetropolis<su2ListElement>(measurements, multiSweep, file);
     break;
   }
 
@@ -171,12 +171,13 @@ template <int dim> void executor<dim>::initListFields(bool cold) {
 
 template <int dim>
 template <class su2Type>
-void executor<dim>::runMetropolis(int measurements, std::ofstream &outFile) {
+void executor<dim>::runMetropolis(int measurements, int multiSweep,
+                                  std::ofstream &outFile) {
   if (useCuda) {
     cudaMetropolizer<4, su2Type> metro(action, multiProbe, delta,
                                        (su2Type *)fields);
     for (int i = 0; i < measurements; i++) {
-      double plaquette = metro.sweep();
+      double plaquette = metro.sweep(multiSweep);
       this->logResults(i, plaquette, metro.getHitRate(), outFile);
     }
   } else {

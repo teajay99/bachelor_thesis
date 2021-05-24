@@ -159,13 +159,15 @@ cudaMetropolizer<dim, su2Type>::~cudaMetropolizer() {
 }
 
 template <int dim, class su2Type>
-double cudaMetropolizer<dim, su2Type>::sweep() {
-  for (int odd = 0; odd < 2; odd++) {
-    for (int mu = 0; mu < dim; mu++) {
-      checkCudaErrors(3);
-      kernel_probeSite<dim, su2Type><<<blockCount, CUDA_BLOCK_SIZE>>>(
-          action, fields, randStates, hitCounts, multiProbe, delta, odd, mu);
-      checkCudaErrors(1);
+double cudaMetropolizer<dim, su2Type>::sweep(int sweeps) {
+  for (int i = 0; i < sweeps; i++) {
+    for (int odd = 0; odd < 2; odd++) {
+      for (int mu = 0; mu < dim; mu++) {
+        checkCudaErrors(3);
+        kernel_probeSite<dim, su2Type><<<blockCount, CUDA_BLOCK_SIZE>>>(
+            action, fields, randStates, hitCounts, multiProbe, delta, odd, mu);
+        checkCudaErrors(1);
+      }
     }
   }
   return this->measurePlaquette();

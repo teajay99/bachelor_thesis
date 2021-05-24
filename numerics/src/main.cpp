@@ -25,8 +25,10 @@ cxxopts::Options getOptions() {
       cxxopts::value<int>()->default_value("10"))(
       "o,output", "Output File Name",
       cxxopts::value<std::string>()->default_value("data.csv"))(
-      "m,measurements", "Number of Sweeps",
+      "m,measurements", "Number of Measurements",
       cxxopts::value<int>()->default_value("1000"))(
+      "multi-sweep", "Number of Sweeps per Measurement",
+      cxxopts::value<int>()->default_value("1"))(
       "partition-iko", "Use The Ikosaeder Subgroup of SU(2) as a gauge group")(
       "partition-list",
       "Use custom partition provided by an additional List (.csv) File",
@@ -50,6 +52,7 @@ int main(int argc, char **argv) {
   double delta = 0;
   int partType = SU2_ELEMENT;
   std::string partFile = "";
+  int multiSweep = 0;
 
   try {
 
@@ -80,6 +83,7 @@ int main(int argc, char **argv) {
     fName = result["output"].as<std::string>();
     delta = result["delta"].as<double>();
     multiProbe = result["hits"].as<int>();
+    multiSweep = result["multi-sweep"].as<int>();
 
   } catch (const cxxopts::OptionException &e) {
     std::cout << "error parsing options: " << e.what() << std::endl;
@@ -97,5 +101,5 @@ int main(int argc, char **argv) {
   executor<4> exec(latSize, beta, multiProbe, delta, partType, useCuda,
                    partFile);
   exec.initFields(cold);
-  exec.run(measurements, fName);
+  exec.run(measurements, multiSweep, fName);
 }
