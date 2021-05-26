@@ -46,12 +46,7 @@ def get600Cell():
                         0.5 * tau * ((-1.)**c)
                     ]))
 
-    sum = [0.,0.,0.,0.]
-    for j in range(120):
-        for i in range(4):
-            sum[i] += out[j][i]/120
-    print("4D:",sum)
-
+    print(out)
     return out
 
 

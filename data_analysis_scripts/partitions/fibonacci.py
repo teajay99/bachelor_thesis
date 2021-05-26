@@ -5,6 +5,7 @@ from math import sin, cos, acos
 import math
 import mpmath
 from pynverse import inversefunc
+import quatternionPlotter as qp
 
 
 def generateLattice(N, outFile, includeAdjoint=False):
@@ -40,12 +41,14 @@ def generateLattice(N, outFile, includeAdjoint=False):
             -getCartesianCoords(ps, th, ph)[3]
         ]
 
-    file = open(outFile, "w")
 
     outRange = N
     if includeAdjoint:
         outRange = 2 * N
 
+    qp.plotPoints(out[:outRange])
+
+    file = open(outFile, "w")
     for i in range(outRange):
         line = "\t".join([str(val) for val in out[i]]) + "\n"
         file.write(line)
@@ -54,7 +57,7 @@ def generateLattice(N, outFile, includeAdjoint=False):
 
 
 def main():
-    N = 250
+    N = 120
     generateLattice(N, "../../numerics/testPart.csv")
 
 
