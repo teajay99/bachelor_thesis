@@ -2,11 +2,6 @@
 #define EXECUTOR_HPP
 
 #include "su2Action.hpp"
-#include "su2Element.hpp"
-#include "su2IkoElement.hpp"
-#include "su2ListElement.hpp"
-//#include "metropolizer.hpp"
-#include "cudaMetropolizer.hpp"
 
 #include <fstream>
 #include <iomanip>

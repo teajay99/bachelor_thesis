@@ -1,4 +1,6 @@
 
 #define SU2_ELEMENT 0
-#define SU2_IKO_ELEMENT 1
-#define SU2_LIST_ELEMENT 2
+#define SU2_TET_ELEMENT 1
+#define SU2_OCT_ELEMENT 2
+#define SU2_ICO_ELEMENT 3
+#define SU2_LIST_ELEMENT 4

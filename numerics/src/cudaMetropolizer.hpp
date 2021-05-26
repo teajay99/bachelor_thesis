@@ -4,8 +4,11 @@
 #include "config.hpp"
 #include "su2Action.hpp"
 #include "su2Element.hpp"
-#include "su2IkoElement.hpp"
 #include "su2ListElement.hpp"
+
+#include "su2IcoElement.hpp"
+#include "su2OctElement.hpp"
+#include "su2TetElement.hpp"
 
 template <int dim, class su2Type> class cudaMetropolizer {
 public:
@@ -36,7 +39,9 @@ private:
 // template class cudaMetropolizer<2>;
 // template class cudaMetropolizer<3>;
 template class cudaMetropolizer<4, su2Element>;
-template class cudaMetropolizer<4, su2IkoElement>;
+template class cudaMetropolizer<4, su2TetElement>;
+template class cudaMetropolizer<4, su2OctElement>;
+template class cudaMetropolizer<4, su2IcoElement>;
 template class cudaMetropolizer<4, su2ListElement>;
 // template class cudaMetropolizer<5>;
 // template class cudaMetropolizer<6>;

@@ -1,3 +1,12 @@
+
+#include "su2Element.hpp"
+#include "su2IcoElement.hpp"
+#include "su2ListElement.hpp"
+#include "su2OctElement.hpp"
+#include "su2TetElement.hpp"
+
+#include "cudaMetropolizer.hpp"
+
 #include "executor.hpp"
 #include "partitions.hpp"
 
@@ -67,8 +76,14 @@ executor<dim>::executor(int iLatSize, double iBeta, int iMultiProbe,
   case SU2_ELEMENT:
     fieldsSize *= sizeof(su2Element);
     break;
-  case SU2_IKO_ELEMENT:
-    fieldsSize *= sizeof(su2IkoElement);
+  case SU2_TET_ELEMENT:
+    fieldsSize *= sizeof(su2TetElement);
+    break;
+  case SU2_OCT_ELEMENT:
+    fieldsSize *= sizeof(su2OctElement);
+    break;
+  case SU2_ICO_ELEMENT:
+    fieldsSize *= sizeof(su2IcoElement);
     break;
   case SU2_LIST_ELEMENT:
     fieldsSize *= sizeof(su2ListElement);
@@ -102,9 +117,17 @@ template <int dim> void executor<dim>::initFields(bool cold) {
       kernel_initFields<dim, su2Element><<<blockCount, CUDA_BLOCK_SIZE>>>(
           (su2Element *)fields, action.getSiteCount(), cold);
       break;
-    case SU2_IKO_ELEMENT:
-      kernel_initFields<dim, su2IkoElement><<<blockCount, CUDA_BLOCK_SIZE>>>(
-          (su2IkoElement *)fields, action.getSiteCount(), cold, 500);
+    case SU2_TET_ELEMENT:
+      kernel_initFields<dim, su2TetElement><<<blockCount, CUDA_BLOCK_SIZE>>>(
+          (su2TetElement *)fields, action.getSiteCount(), cold, 500);
+      break;
+    case SU2_OCT_ELEMENT:
+      kernel_initFields<dim, su2OctElement><<<blockCount, CUDA_BLOCK_SIZE>>>(
+          (su2OctElement *)fields, action.getSiteCount(), cold, 500);
+      break;
+    case SU2_ICO_ELEMENT:
+      kernel_initFields<dim, su2IcoElement><<<blockCount, CUDA_BLOCK_SIZE>>>(
+          (su2IcoElement *)fields, action.getSiteCount(), cold, 500);
       break;
     case SU2_LIST_ELEMENT:
       initListFields(cold);
@@ -123,8 +146,14 @@ void executor<dim>::run(int measurements, int multiSweep, std::string outFile) {
   case SU2_ELEMENT:
     this->runMetropolis<su2Element>(measurements, multiSweep, file);
     break;
-  case SU2_IKO_ELEMENT:
-    this->runMetropolis<su2IkoElement>(measurements, multiSweep, file);
+  case SU2_TET_ELEMENT:
+    this->runMetropolis<su2TetElement>(measurements, multiSweep, file);
+    break;
+  case SU2_OCT_ELEMENT:
+    this->runMetropolis<su2OctElement>(measurements, multiSweep, file);
+    break;
+  case SU2_ICO_ELEMENT:
+    this->runMetropolis<su2IcoElement>(measurements, multiSweep, file);
     break;
 
   case SU2_LIST_ELEMENT:

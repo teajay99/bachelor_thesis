@@ -2,7 +2,7 @@
 
 import math
 
-
+import quatternionPlotter as qp
 
 
 def get600Cell():
@@ -57,6 +57,9 @@ def get600Cell():
 
 def generateLattice(i, outFile):
     file = open(outFile, "w")
+
+    qp.plotPoints(get600Cell())
+
     for i in get600Cell():
         line = "\t".join([str(val) for val in i]) + "\n"
         file.write(line)

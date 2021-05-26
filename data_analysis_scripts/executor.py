@@ -60,12 +60,12 @@ class executor:
                 callList.append(partition[i])
                 if partitionFile[i] != None:
                     callList.append(partitionFile[i])
-            if hits != None:
+            if hits[i] != None:
                 callList.append("--hits")
                 callList.append(str(hits[i]))
             if cold[i]:
                 callList.append("-c")
-            if multiSweep != None:
+            if multiSweep[i] != None:
                 callList.append("--multi-sweep")
                 callList.append(str(multiSweep[i]))
 
@@ -118,12 +118,12 @@ class executor:
                         if partitionFile != None:
                             callList.append(partitionFile[i])
 
-                    if hits != None:
+                    if hits[i] != None:
                         callList.append("--hits")
                         callList.append(str(hits[i]))
                     if cold[i]:
                         callList.append("-c")
-                    if multiSweep != None:
+                    if multiSweep[i] != None:
                         callList.append("--multi-sweep")
                         callList.append(str(multiSweep[i]))
 

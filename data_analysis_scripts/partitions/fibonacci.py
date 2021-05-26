@@ -4,9 +4,10 @@ import sympy as sp
 from math import sin, cos, acos
 import math
 import mpmath
+from pynverse import inversefunc
 
 
-def generateLattice(N, outFile):
+def generateLattice(N, outFile, includeAdjoint=False):
     out = [[0., 0., 0., 0.] for i in range(2 * N)]
 
     def getCartesianCoords(psi, theta, phi):
@@ -17,12 +18,11 @@ def generateLattice(N, outFile):
             sin(psi) * sin(theta) * sin(phi)
         ]
 
-    for n in range(1, N + 1):
+    for n in range(N):
 
         # Calculating Psi
-        ps = mpmath.findroot(
-            lambda psi: (psi + (0.5 * sin(2 * psi))) -
-            ((math.pi * n) / (N + 1)), (math.pi * n) / (N + 1))
+        ps = inversefunc(lambda x: (x - (0.5 * sin(2 * x))),
+                         y_values=(math.pi * n) / (N + 1))
 
         # Calculating Theta
         th = sp.acos(1 - (2 * sp.Mod(n * sp.sqrt(2), 1)))
@@ -32,8 +32,8 @@ def generateLattice(N, outFile):
         ph = 2 * sp.pi * sp.Mod(n * sp.sqrt(3), 1)
         ph = sp.N(ph, 20)
 
-        out[2 * (n - 1)] = getCartesianCoords(ps, th, ph)
-        out[2 * (n - 1) + 1] = [
+        out[n] = getCartesianCoords(ps, th, ph)
+        out[N + n] = [
             getCartesianCoords(ps, th,
                                ph)[0], -getCartesianCoords(ps, th, ph)[1],
             -getCartesianCoords(ps, th, ph)[2],
@@ -42,7 +42,11 @@ def generateLattice(N, outFile):
 
     file = open(outFile, "w")
 
-    for i in range(2*N):
+    outRange = N
+    if includeAdjoint:
+        outRange = 2 * N
+
+    for i in range(outRange):
         line = "\t".join([str(val) for val in out[i]]) + "\n"
         file.write(line)
 
@@ -50,7 +54,7 @@ def generateLattice(N, outFile):
 
 
 def main():
-    N = 500
+    N = 250
     generateLattice(N, "../../numerics/testPart.csv")
 
 

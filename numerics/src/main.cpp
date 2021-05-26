@@ -29,7 +29,11 @@ cxxopts::Options getOptions() {
       cxxopts::value<int>()->default_value("1000"))(
       "multi-sweep", "Number of Sweeps per Measurement",
       cxxopts::value<int>()->default_value("1"))(
-      "partition-iko", "Use The Ikosaeder Subgroup of SU(2) as a gauge group")(
+      "partition-tet",
+      "Use the tetrahedral subgroup of SU(2) as a gauge group")(
+      "partition-oct", "Use the Octahedral subgroup of SU(2) as a gauge group")(
+      "partition-ico",
+      "Use the icosahedral subgroup of SU(2) as a gauge group")(
       "partition-list",
       "Use custom partition provided by an additional List (.csv) File",
       cxxopts::value<std::string>())("c,cold", "Cold Start")(
@@ -70,8 +74,8 @@ int main(int argc, char **argv) {
       useCuda = true;
     }
 
-    if (result.count("partition-iko")) {
-      partType = SU2_IKO_ELEMENT;
+    if (result.count("partition-ico")) {
+      partType = SU2_ICO_ELEMENT;
     } else if (result.count("partition-list")) {
       partFile = result["partition-list"].as<std::string>();
       partType = SU2_LIST_ELEMENT;
