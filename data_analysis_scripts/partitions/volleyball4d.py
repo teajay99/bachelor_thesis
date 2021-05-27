@@ -75,7 +75,7 @@ def generateLattice(subdivs, outFile):
 
 
 def main():
-    N = 4
+    N = 1
     generateLattice(N, "../../numerics/testPart.csv")
 
 

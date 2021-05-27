@@ -28,7 +28,7 @@ def get600Cell():
         for b in range(2):
             for c in range(2):
                 for d in range(2):
-                    out.append([((-one)**a) / 2, ((-one)**b) / 2, ((-one) / 2),
+                    out.append([((-one)**a) / 2, ((-one)**b) / 2, ((-one)**c / 2),
                                 ((-one)**d) / 2])
 
     # R[1,1]
@@ -84,11 +84,14 @@ def getAllVertexCells(neighbours, v):
             for j in range(len(set)):
                 norm = ((set[i] - set[j]).transpose() * (set[i] - set[j]))[0,
                                                                            0]
-                if j != i and (not (sp.simplify(norm - edgeLengthSqrd) == 0)):
+                if j != i and (
+                        not (np.abs(sp.N(norm - edgeLengthSqrd, 8)) < 1e-5)):
                     return False
         return True
 
     subset(neighbours, 3, 0, [])
+
+    #print("mögliche Zellen", len(potentialCells), len(neighbours))
 
     cells = []
 
@@ -105,9 +108,12 @@ def getAllCells(v, vertices):
     neighbours = []
     for w in vertices:
         norm = ((w - v).transpose() * (w - v))[0, 0]
-        if sp.simplify(norm - edgeLengthSqrd) == 0:
+        if np.abs(sp.N(norm - edgeLengthSqrd, 8)) < 1e-5:
             neighbours.append(w)
+
+
     print("*")
+
     return getAllVertexCells(neighbours, v)
 
 

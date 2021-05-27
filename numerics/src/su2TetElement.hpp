@@ -26,8 +26,8 @@ public:
     for (int i = 0; i < 4; i++) {
       if (abs(su2Element::element[i]) < TET_EPS) {
         su2Element::element[i] = 0;
-      } else if (roundToIko(&su2Element::element[i], 0.5)) {
-      } else if (roundToIko(&su2Element::element[i], 1.0)) {
+      } else if (roundToTet(&su2Element::element[i], 0.5)) {
+      } else if (roundToTet(&su2Element::element[i], 1.0)) {
       } else {
         printf("You just left the Gauge Group [%f,%f,%f,%f]\n",
                su2Element::element[0], su2Element::element[1],
@@ -62,7 +62,7 @@ protected:
     return su2TetElement(&multEl[0]) * (*this);
   };
 
-  __host__ __device__ bool roundToIko(double *el, double roundVal) {
+  __host__ __device__ bool roundToTet(double *el, double roundVal) {
     if ((abs(*el) + TET_EPS) > roundVal && (abs(*el) - TET_EPS) < roundVal) {
       *el = ((*el > 0) - (*el < 0)) * roundVal;
       return true;

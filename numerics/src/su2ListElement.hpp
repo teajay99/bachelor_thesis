@@ -32,13 +32,6 @@ public:
     }
   };
 
-  // su2ListElement &operator=(const su2Element &el) {
-  //   for (int i = 0; i < 4; i++) {
-  //     su2Element::element[i] = el[i];
-  //   }
-  //   return *this;
-  // };
-
   __device__ __host__ void renormalize(){};
 
   su2ListElement randomize(double delta, std::mt19937 &gen) {

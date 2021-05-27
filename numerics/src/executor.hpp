@@ -11,7 +11,7 @@
 template <int dim> class executor {
 public:
   executor(int latSize, double beta, int multiProbe, double delta, int partType,
-           bool useCuda, std::string partFile);
+           bool useCuda, std::string partFile, int iSubdivs);
   ~executor();
 
   void initFields(bool cold);
@@ -36,6 +36,9 @@ private:
   // List specific stuff
   su2Element *elementList;
   double *distList;
+
+  // Volleyball stuff
+  int subdivs;
 };
 
 template class executor<4>;

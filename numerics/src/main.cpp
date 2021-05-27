@@ -36,9 +36,10 @@ cxxopts::Options getOptions() {
       "Use the icosahedral subgroup of SU(2) as a gauge group")(
       "partition-list",
       "Use custom partition provided by an additional List (.csv) File",
-      cxxopts::value<std::string>())("c,cold", "Cold Start")(
-      "v,verbose", "Verbose output",
-      cxxopts::value<bool>()->default_value("false"));
+      cxxopts::value<std::string>())(
+      "partition-volley", "Use volleybal mesh on SU(2)", cxxopts::value<int>())(
+      "c,cold", "Cold Start")("v,verbose", "Verbose output",
+                              cxxopts::value<bool>()->default_value("false"));
 
   return options;
 }
@@ -57,6 +58,7 @@ int main(int argc, char **argv) {
   int partType = SU2_ELEMENT;
   std::string partFile = "";
   int multiSweep = 0;
+  int subdivs = 0;
 
   try {
 
@@ -76,9 +78,18 @@ int main(int argc, char **argv) {
 
     if (result.count("partition-ico")) {
       partType = SU2_ICO_ELEMENT;
-    } else if (result.count("partition-list")) {
+    } else if (result.count("partition-oct")) {
+      partType = SU2_OCT_ELEMENT;
+    } else if (result.count("partition-tet")) {
+      partType = SU2_TET_ELEMENT;
+    }
+
+    else if (result.count("partition-list")) {
       partFile = result["partition-list"].as<std::string>();
       partType = SU2_LIST_ELEMENT;
+    } else if (result.count("partition-volley")) {
+      partType = SU2_VOLLEY_ELEMENT;
+      subdivs = result["partition-volley"].as<int>();
     }
 
     beta = result["beta"].as<double>();
@@ -103,7 +114,7 @@ int main(int argc, char **argv) {
   // su2Action<4> action(latSize, beta);
 
   executor<4> exec(latSize, beta, multiProbe, delta, partType, useCuda,
-                   partFile);
+                   partFile, subdivs);
   exec.initFields(cold);
   exec.run(measurements, multiSweep, fName);
 }
