@@ -65,8 +65,8 @@ protected:
     int offset = direction >> 2;
 
     multEl[1 + ((offset) % 3)] = 0;
-    multEl[1 + ((offset + 1) % 3)] = signOne * ICO_TAU_PRIME_HALF;
-    multEl[1 + ((offset + 2) % 3)] = signTwo * 0.5;
+    multEl[1 + ((offset + 1) % 3)] = signOne * 0.5;
+    multEl[1 + ((offset + 2) % 3)] = signTwo * ICO_TAU_PRIME_HALF;
 
     return su2IcoElement(&multEl[0]) * (*this);
   };
