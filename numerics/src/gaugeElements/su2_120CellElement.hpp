@@ -44,16 +44,30 @@
 
 class su2_120CellElement : public su2Element {
 public:
-  __device__ __host__ su2_120CellElement() {
+  __device__ __host__ su2_120CellElement()
+      : rotationMatrices C120_ROT_MATRICES {
     rotIndex = 4;
     icoPos = su2Element();
     this->applyRotation();
   };
 
-  __device__ __host__ su2_120CellElement(su2Element iIcoPos, int iRotIndex) {
+  __device__ __host__ su2_120CellElement(su2Element iIcoPos, int iRotIndex)
+      : rotationMatrices C120_ROT_MATRICES {
     icoPos = iIcoPos;
     rotIndex = iRotIndex;
+
     this->applyRotation();
+  };
+
+  __device__ __host__ su2_120CellElement(su2Element iIcoPos, int iRotIndex,
+                                         double *el)
+      : rotationMatrices C120_ROT_MATRICES {
+    icoPos = iIcoPos;
+    rotIndex = iRotIndex;
+
+    for (int i = 0; i < 4; i++) {
+      su2Element::element[i] = el[i];
+    }
   };
 
   __device__ __host__ void renormalize() {
@@ -102,23 +116,28 @@ protected:
     // 3 out of 4 cases, where this vertex transitions to another
     // vertex adjacent to a different vertex of the 600 Cell
     else {
-      int icoNewIndex[4][3] = C120_ICO_ROTADED_ROT_INDICES;
-      int newRotIndex = icoNewIndex[rotIndex][direction];
+      int newRotIndex = (direction + rotIndex + 1) % 4;
+      //int icoNewIndex[4][3] = C120_ICO_ROTADED_ROT_INDICES;
+      //int newRotIndex = icoNewIndex[rotIndex][direction];
 
       for (int i = 0; i < 12; i++) {
         su2Element newIcoPos = getIcoMultElement(i) * icoPos;
-        out = su2_120CellElement(newIcoPos, newRotIndex);
 
-        double cosTheta = (out[0] * (*this)[0]) + (out[1] * (*this)[1]) +
-                          (out[2] * (*this)[2]) + (out[3] * (*this)[3]);
+        double outCoords[4];
+
+        applyRotation(newIcoPos, newRotIndex, &outCoords[0]);
+
+        double cosTheta =
+            (outCoords[0] * (*this)[0]) + (outCoords[1] * (*this)[1]) +
+            (outCoords[2] * (*this)[2]) + (outCoords[3] * (*this)[3]);
         if (abs(cosTheta - C120_RHO) < IKO_EPS) {
+          out = su2_120CellElement(newIcoPos, newRotIndex, &outCoords[0]);
           break;
         }
       }
     }
 
-    // printf("cos(theta): %f\n", (out[0] * (*this)[0]) + (out[1] * (*this)[1])
-    // +
+    // printf("cos(theta): %f\n", (out[0] * (*this)[0]) + (out[1] * (*this)[1]) +
     //                                (out[2] * (*this)[2]) +
     //                                (out[3] * (*this)[3]));
     return out;
@@ -132,23 +151,23 @@ protected:
     return false;
   }
 
-  // __host__ __device__ void applyRotation(){
-  //     applyRotation(icoPos, &su2Element::element[0])};
-
   __host__ __device__ void applyRotation() {
-    if (rotIndex < 4) {
-      double rotationMatrices[4][4][4] = C120_ROT_MATRICES;
+    applyRotation(icoPos, rotIndex, &su2Element::element[0]);
+  };
+
+  __host__ __device__ void applyRotation(su2Element &inp, int &rIndex,
+                                         double *out) {
+    if (rIndex < 4) {
 
       for (int i = 0; i < 4; i++) {
-        su2Element::element[i] = 0;
+        out[i] = 0;
         for (int j = 0; j < 4; j++) {
-          su2Element::element[i] +=
-              rotationMatrices[rotIndex][i][j] * icoPos[j];
+          out[i] += rotationMatrices[rIndex][i][j] * inp[j];
         }
       }
     } else {
       for (int i = 0; i < 4; i++) {
-        su2Element::element[i] = icoPos[i];
+        out[i] = inp[i];
       }
     }
   };
@@ -169,6 +188,8 @@ protected:
 
   su2Element icoPos;
   int rotIndex;
+  double rotationMatrices[4][4][4];
+
   // rotIndex indicates by which of the four rotation
   // matrices the current vertex is rotated. 4 => no rotation
 };
