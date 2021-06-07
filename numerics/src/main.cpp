@@ -34,6 +34,14 @@ cxxopts::Options getOptions() {
       "partition-oct", "Use the Octahedral subgroup of SU(2) as a gauge group")(
       "partition-ico",
       "Use the icosahedral subgroup of SU(2) as a gauge group")(
+      "partition-c5", "Use the 5 vertices of the 5-cell as a gauge set")(
+      "partition-c8", "Use the 16 vertices of the 8-cell as a gauge set")(
+      "partition-c16", "Use the 8 vertices of the 16-cell as a gauge set")(
+      "partition-c24", "Use the 24 vertices of the 24-cell as a gauge set "
+                       "(Same as --partition-tet)")(
+      "partition-c120", "Use the 600 vertices of the 120-cell as a gauge set")(
+      "partition-c600", "Use the 120 vertices of the 600-cell as a gauge set "
+                        "(Same as --partition-ico)")(
       "partition-list",
       "Use custom partition provided by an additional List (.csv) File",
       cxxopts::value<std::string>())(
@@ -82,6 +90,18 @@ int main(int argc, char **argv) {
       partType = SU2_OCT_ELEMENT;
     } else if (result.count("partition-tet")) {
       partType = SU2_TET_ELEMENT;
+    } else if (result.count("partition-c5")) {
+      partType = SU2_5_CELL_ELEMENT;
+    } else if (result.count("partition-c8")) {
+      partType = SU2_VOLLEY_ELEMENT;
+    } else if (result.count("partition-c16")) {
+      partType = SU2_16_CELL_ELEMENT;
+    } else if (result.count("partition-c24")) {
+      partType = SU2_TET_ELEMENT;
+    } else if (result.count("partition-c120")) {
+      partType = SU2_120_CELL_ELEMENT;
+    } else if (result.count("partition-c600")) {
+      partType = SU2_ICO_ELEMENT;
     }
 
     else if (result.count("partition-list")) {

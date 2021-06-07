@@ -5,12 +5,42 @@
 
 Betrachtet wird die Wirkung
 \begin{align*}
-  S_G^{(\textrm{eukl})} &= \beta \sum_{P \in \Lambda} \left(1-\frac{1}{2} \textrm{Tr} \left[ U_P \right] \right)
+ S_G^{(\textrm{eukl})} & = \beta \sum_{P \in \Lambda} \left(1-\frac{1}{2} \textrm{Tr} \left[ U_P \right] \right)
 \end{align*}
 wobei mit $P$ Plaquettes im Konfigurationsraum $\Lambda$ bezeichnet werden, und mit $U_P$ das pfadgeordnete Produkt der Link-Variablen entlang des Plaquettes P.
 
 \subsection{Metropolis}
 
+
+\begin{align*}
+ &R = \left\{
+ \begin{bmatrix}
+  \rho    & \theta  & \theta  & \theta  \\
+  -\theta & \rho    & -\theta & \theta  \\
+  -\theta & \theta  & \rho    & -\theta \\
+  -\theta & -\theta & \theta  & \rho    \\
+ \end{bmatrix},
+ \begin{bmatrix}
+  \rho    & -\theta & \theta & -\theta \\
+  \theta  & \rho    & \theta & \theta  \\
+  -\theta & -\theta  & \rho   & \theta  \\
+  \theta  & -\theta & -\theta & \rho    \\
+ \end{bmatrix},
+ \begin{bmatrix}
+  \rho    & \theta & -\theta & -\theta \\
+  -\theta  & \rho    & \theta & -\theta  \\
+  \theta & -\theta  & \rho   & -\theta  \\
+  \theta  & \theta & \theta & \rho    \\
+ \end{bmatrix},
+ \begin{bmatrix}
+  \rho    & -\theta & -\theta & \theta \\
+  \theta  & \rho    & -\theta & -\theta  \\
+  \theta & \theta  & \rho   & \theta  \\
+  -\theta  & \theta & -\theta & \rho    \\
+ \end{bmatrix}
+ \right\}\\\\
+ &\textrm{with} \qquad \rho = \frac{1 + 3\sqrt{5}}{8} \qquad \textrm{and} \qquad \theta = \frac{1-\sqrt{5}}{8}
+\end{align*}
 
 
 % \begin{itemize}

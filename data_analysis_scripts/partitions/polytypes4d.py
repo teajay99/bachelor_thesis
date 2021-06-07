@@ -3,7 +3,7 @@ import sympy as sp
 import numpy as np
 from sympy.algebras.quaternion import Quaternion
 from pathos.pools import ProcessPool
-
+import random
 import itertools
 
 eta = sp.sqrt(5) / 4
@@ -121,51 +121,50 @@ def get120Cell():
     out = []
     for p in get5Cell():
         for q in get600Cell():
-            out.append(
-                Quaternion(1 / sp.sqrt(2), 1 / sp.sqrt(2), 0, 0) * p * q)
+            # out.append(
+            #     Quaternion(1 / sp.sqrt(2), 1 / sp.sqrt(2), 0, 0) * p * q)
+            out.append(p * q)
     return out
 
 
-sPPoints = get120Cell()
-#points = [[sp.N(q.a), sp.N(q.b), sp.N(q.c), sp.N(q.d)] for q in sPPoints]
-#print(points)
-
-id = Quaternion(1, 0, 0, 0)
-
-u = sPPoints[0].conjugate() * id
-
-sPPoints = [p * u for p in sPPoints]
-
-points = [[sp.N(q.a), sp.N(q.b), sp.N(q.c), sp.N(q.d)] for q in sPPoints]
-
-#[print(p) for p in sPPoints]
-
-
-def getNeighbours(index):
-    neighbours = []
-
-    for i in range(len(points)):
-        if np.abs(
-                np.dot(np.array(points[i]), np.array(points[index])) -
-                0.963525491562421) < 1e-8:
-            neighbours.append(sPPoints[i])
-
-    #[print(sp.simplify(p)) for p in neighbours]
-
-    print("\n", sPPoints[index], "\n")
-    return neighbours
-
-
-#print(sPPoints[:8])
-
-
 def testMetropolisRotation():
+
+    sPPoints = get120Cell()
+    #points = [[sp.N(q.a), sp.N(q.b), sp.N(q.c), sp.N(q.d)] for q in sPPoints]
+    #print(points)
+
+    id = Quaternion(1, 0, 0, 0)
+
+    u = sPPoints[0].conjugate() * id
+
+    #sPPoints = [p * u for p in sPPoints]
+
+    points = [[sp.N(q.a), sp.N(q.b), sp.N(q.c), sp.N(q.d)] for q in sPPoints]
+
+    #[print(p) for p in sPPoints]
+
+    def getNeighbours(index):
+        neighbours = []
+
+        for i in range(len(points)):
+            if np.abs(
+                    np.dot(np.array(points[i]), np.array(points[index])) -
+                    0.963525491562421) < 1e-8:
+                neighbours.append(sPPoints[i])
+
+        #[print(sp.simplify(p)) for p in neighbours]
+
+        print("\n", sPPoints[index], "\n")
+        return neighbours
+
+    #print(sPPoints[:16])
+
     neighbours = [[] for i in range(4)]
 
-    neighbours[0] = getNeighbours(0)
-    neighbours[1] = getNeighbours(2)
-    neighbours[2] = getNeighbours(7)
-    neighbours[3] = getNeighbours(4)
+    neighbours[0] = getNeighbours(1)
+    neighbours[1] = getNeighbours(3)
+    neighbours[2] = getNeighbours(5)
+    neighbours[3] = getNeighbours(7)
 
     indexPerms = list(itertools.permutations([0, 1, 2, 3]))
     indexPerms = [list(k) for k in indexPerms]
@@ -288,7 +287,6 @@ def testMetropolisRotation():
 
     checkPermSymb([[0, 1, 2, 3], [3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1]])
 
-
     dists = []
     for p in points:
         for q in points:
@@ -300,3 +298,243 @@ def testMetropolisRotation():
             neighbourCounter += 1
 
     print(neighbourCounter)
+
+
+#testMetropolisRotation()
+
+# points = get120Cell()
+# pointsOrg = [
+#     Quaternion(1 / sp.sqrt(2), 1 / sp.sqrt(2), 0, 0) * q for q in get120Cell()
+# ]
+
+rotMats = [
+    sp.Matrix([[
+        1 / 8 + 3 * sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8,
+        1 / 8 - sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8
+    ],
+               [
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8,
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8
+               ],
+               [
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8,
+                   1 / 8 + 3 * sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8
+               ],
+               [
+                   -1 / 8 + sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8,
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8
+               ]]),
+    sp.Matrix([[
+        1 / 8 + 3 * sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8,
+        1 / 8 - sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8
+    ],
+               [
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8,
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8
+               ],
+               [
+                   -1 / 8 + sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8,
+                   1 / 8 + 3 * sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8
+               ],
+               [
+                   1 / 8 - sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8,
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8
+               ]]),
+    sp.Matrix([[
+        1 / 8 + 3 * sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8,
+        -1 / 8 + sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8
+    ],
+               [
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8,
+                   1 / 8 - sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8
+               ],
+               [
+                   1 / 8 - sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8,
+                   1 / 8 + 3 * sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8
+               ],
+               [
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8,
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8
+               ]]),
+    sp.Matrix([[
+        1 / 8 + 3 * sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8,
+        -1 / 8 + sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8
+    ],
+               [
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8,
+                   -1 / 8 + sp.sqrt(5) / 8, -1 / 8 + sp.sqrt(5) / 8
+               ],
+               [
+                   1 / 8 - sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8,
+                   1 / 8 + 3 * sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8
+               ],
+               [
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 - sp.sqrt(5) / 8,
+                   -1 / 8 + sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8
+               ]])
+]
+
+
+def quadProd(m, n):
+    q1 = Quaternion(*[m[i, 0] for i in range(4)])
+    q2 = Quaternion(*[n[i, 0] for i in range(4)])
+    out = q1 * q2
+    return sp.Matrix([[out.a], [out.b], [out.c], [out.d]])
+
+
+def getCStuff():
+
+    #Printing Rotation Matrices
+    for m in rotMats:
+        out = "{"
+        for i in range(4):
+            out += "{"
+            out += ",".join([str(sp.N(m[i, j], 20)) for j in range(4)])
+            out += "},"
+        out += "},"
+        print(out)
+
+    neighbours = [
+        sp.Matrix([[tau / 2], [0], [one / 2], [1 / (2 * tau)]]),
+        sp.Matrix([[tau / 2], [0], [one / 2], [-1 / (2 * tau)]]),
+        sp.Matrix([[tau / 2], [0], [-one / 2], [1 / (2 * tau)]]),
+        sp.Matrix([[tau / 2], [0], [-one / 2], [-1 / (2 * tau)]]),
+        sp.Matrix([[tau / 2], [1 / (2 * tau)], [0], [one / 2]]),
+        sp.Matrix([[tau / 2], [-1 / (2 * tau)], [0], [one / 2]]),
+        sp.Matrix([[tau / 2], [1 / (2 * tau)], [0], [-one / 2]]),
+        sp.Matrix([[tau / 2], [-1 / (2 * tau)], [0], [-one / 2]]),
+        sp.Matrix([[tau / 2], [one / 2], [1 / (2 * tau)], [0]]),
+        sp.Matrix([[tau / 2], [one / 2], [-1 / (2 * tau)], [0]]),
+        sp.Matrix([[tau / 2], [-one / 2], [1 / (2 * tau)], [0]]),
+        sp.Matrix([[tau / 2], [-one / 2], [-1 / (2 * tau)], [0]]),
+    ]
+
+    #id = sp.Matrix([[1], [0], [0], [0]])
+
+    id = quadProd(neighbours[10],
+                  quadProd(neighbours[0], sp.Matrix([[1], [0], [0], [0]])))
+
+    id_num = np.array([sp.N(id[j, 0]) for j in range(4)])
+
+    # neighbours = [
+    #     quadProd(neighbours[10], quadProd(neighbours[0], n))
+    #     for n in neighbours
+    # ]
+
+    icoRots_num = [[] for i in range(4)]
+    icoRots = [[] for i in range(4)]
+    icoRotIndices = [[] for i in range(4)]
+    rotIndices = [[] for i in range(4)]
+
+    for m in range(len(rotMats)):
+        idRot = rotMats[m] * id
+
+        for n in range(len(rotMats)):
+            for k in range(len(neighbours)):
+                neighRot = rotMats[n] * quadProd(neighbours[k], id)
+
+                prod = idRot.transpose() * neighRot
+                prod_num = sp.N(prod[0, 0])
+
+                if np.abs(prod_num - 0.96352549156242113615) < 1e-8:
+                    icoRots_num[m].append(
+                        [sp.N(neighbours[k][j, 0]) for j in range(4)])
+                    icoRots[m].append(neighbours[k])
+                    rotIndices[m].append(n)
+                    icoRotIndices[m].append(k)
+
+    print(str(icoRots_num).replace("[", "{").replace("]", "}"))
+    print(str(rotIndices).replace("[", "{").replace("]", "}"))
+
+    print(icoRotIndices)
+
+    icoEl = sp.Matrix([[1], [0], [0], [0]])
+
+    # for i in range(1000):
+    #     for m in range(4):
+    #         for j in range(3):
+    #             #print(icoRots[m][j])
+    #             prod = (rotMats[m] * icoEl).transpose() * (
+    #                 rotMats[rotIndices[m][j]] * quadProd(icoRots[m][j], icoEl))
+    #             print(sp.N(prod[0, 0]))
+    #
+    #     icoEl = sp.simplify(quadProd(neighbours[random.randint(0, 11)], icoEl))
+
+
+getCStuff()
+
+# newNeigh = [
+#     np.array([
+#         np.float64(sp.N(p[0])),
+#         np.float64(sp.N(p[1])),
+#         np.float64(sp.N(p[2])),
+#         np.float64(sp.N(p[3]))
+#     ]) for p in newNeigh
+# ]
+#
+# for n in newNeigh:
+#    print(np.dot(n, id), n)
+#
+# c600 = [sp.Matrix([[q.a], [q.b], [q.c], [q.d]]) for q in get600Cell()]
+# pointsByRot = [p for p in c600]
+#
+# for m in rotMats:
+#     pointsByRot.extend([m * p for p in c600])
+#
+# pointsByRot = [
+#     np.array([
+#         np.float64(sp.N(p[0])),
+#         np.float64(sp.N(p[1])),
+#         np.float64(sp.N(p[2])),
+#         np.float64(sp.N(p[3]))
+#     ]) for p in pointsByRot
+# ]
+#
+# points = [
+#     np.array([
+#         np.float64(sp.N(q.a)),
+#         np.float64(sp.N(q.b)),
+#         np.float64(sp.N(q.c)),
+#         np.float64(sp.N(q.d))
+#     ]) for q in points
+# ]
+#
+# pointsOrg = [
+#     np.array([
+#         np.float64(sp.N(q.a)),
+#         np.float64(sp.N(q.b)),
+#         np.float64(sp.N(q.c)),
+#         np.float64(sp.N(q.d))
+#     ]) for q in pointsOrg
+# ]
+#
+# dists = []
+# distsOrg = []
+# distsByRot = []
+#
+# for i in range(600):
+#     for j in range(600):
+#         dists.append(np.dot(points[i], points[j]))
+#         distsOrg.append(np.dot(pointsOrg[i], pointsOrg[j]))
+#         distsByRot.append(np.dot(pointsByRot[i], pointsByRot[j]))
+#
+# dists.sort()
+# distsOrg.sort()
+# distsByRot.sort()
+#
+# pointsWork = True
+# pointsByRotWork = True
+#
+# print(len(distsOrg))
+# for i in range(len(distsOrg)):
+#     if np.abs(dists[i] - distsOrg[i]) > 1e-8:
+#         print("Something Stinks with leaving out 1/sqrt")
+#     if np.abs(dists[i] - distsByRot[i]) > 1e-8:
+#         print("Something Stinks with rotations")
+#
+# if pointsWork:
+#     print("Leaving out 1/sqrt is fine")
+# if pointsByRotWork:
+#     print("Rotation Matrices Rock")
+#
+# print(len(points), len(pointsOrg), len(pointsByRot))

@@ -1,11 +1,3 @@
-
-#include "su2Element.hpp"
-#include "su2IcoElement.hpp"
-#include "su2ListElement.hpp"
-#include "su2OctElement.hpp"
-#include "su2TetElement.hpp"
-#include "su2VolleyElement.hpp"
-
 #include "cudaMetropolizer.hpp"
 
 #include "executor.hpp"
@@ -118,6 +110,15 @@ executor<dim>::executor(int iLatSize, double iBeta, int iMultiProbe,
   case SU2_VOLLEY_ELEMENT:
     fieldsSize *= sizeof(su2VolleyElement);
     break;
+  case SU2_5_CELL_ELEMENT:
+    fieldsSize *= sizeof(su2_5CellElement);
+    break;
+  case SU2_16_CELL_ELEMENT:
+    fieldsSize *= sizeof(su2_16CellElement);
+    break;
+  case SU2_120_CELL_ELEMENT:
+    fieldsSize *= sizeof(su2_120CellElement);
+    break;
   }
 
   if (useCuda) {
@@ -166,6 +167,20 @@ template <int dim> void executor<dim>::initFields(bool cold) {
       kernel_initVolleyFields<dim><<<blockCount, CUDA_BLOCK_SIZE>>>(
           (su2VolleyElement *)fields, action.getSiteCount(), cold, subdivs);
       break;
+    case SU2_5_CELL_ELEMENT:
+      kernel_initFields<dim, su2_5CellElement><<<blockCount, CUDA_BLOCK_SIZE>>>(
+          (su2_5CellElement *)fields, action.getSiteCount(), cold, 500);
+      break;
+    case SU2_16_CELL_ELEMENT:
+      kernel_initFields<dim, su2_16CellElement>
+          <<<blockCount, CUDA_BLOCK_SIZE>>>((su2_16CellElement *)fields,
+                                            action.getSiteCount(), cold, 500);
+      break;
+    case SU2_120_CELL_ELEMENT:
+      kernel_initFields<dim, su2_120CellElement>
+          <<<blockCount, CUDA_BLOCK_SIZE>>>((su2_120CellElement *)fields,
+                                            action.getSiteCount(), cold, 500);
+      break;
     }
   } else {
     // WIP
@@ -194,6 +209,15 @@ void executor<dim>::run(int measurements, int multiSweep, std::string outFile) {
     break;
   case SU2_VOLLEY_ELEMENT:
     this->runMetropolis<su2VolleyElement>(measurements, multiSweep, file);
+    break;
+  case SU2_5_CELL_ELEMENT:
+    this->runMetropolis<su2_5CellElement>(measurements, multiSweep, file);
+    break;
+  case SU2_16_CELL_ELEMENT:
+    this->runMetropolis<su2_16CellElement>(measurements, multiSweep, file);
+    break;
+  case SU2_120_CELL_ELEMENT:
+    this->runMetropolis<su2_120CellElement>(measurements, multiSweep, file);
     break;
   }
 
