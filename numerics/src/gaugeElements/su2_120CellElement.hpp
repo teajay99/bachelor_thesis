@@ -37,10 +37,6 @@
     }                                                                          \
   }
 
-#define C120_ICO_ROTADED_ROT_INDICES                                           \
-  {                                                                            \
-    {1, 2, 3}, {0, 2, 3}, {0, 1, 3}, { 0, 1, 2 }                               \
-  }
 
 class su2_120CellElement : public su2Element {
 public:
@@ -117,8 +113,6 @@ protected:
     // vertex adjacent to a different vertex of the 600 Cell
     else {
       int newRotIndex = (direction + rotIndex + 1) % 4;
-      //int icoNewIndex[4][3] = C120_ICO_ROTADED_ROT_INDICES;
-      //int newRotIndex = icoNewIndex[rotIndex][direction];
 
       for (int i = 0; i < 12; i++) {
         su2Element newIcoPos = getIcoMultElement(i) * icoPos;
