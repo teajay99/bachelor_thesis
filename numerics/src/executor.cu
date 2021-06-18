@@ -56,7 +56,6 @@ __global__ void kernel_initVolleyFields(su2VolleyElement *fields, int nMax,
 template <int dim>
 __global__ void kernel_initListFields(su2ListElement *fields, int nMax,
                                       bool cold, discretizer disc,
-                                      double *distList,
                                       su2Element *elementList) {
   int idx = threadIdx.x + blockDim.x * blockIdx.x;
 
@@ -66,7 +65,7 @@ __global__ void kernel_initListFields(su2ListElement *fields, int nMax,
   if (idx < nMax) {
     for (int mu = 0; mu < dim; mu++) {
       int loc = (dim * idx) + mu;
-      fields[loc] = su2ListElement(0, disc, elementList, distList);
+      fields[loc] = su2ListElement(0, disc, elementList);
     }
 
     if (!cold) {
@@ -132,7 +131,6 @@ template <int dim> executor<dim>::~executor() {
   if (useCuda) {
     cudaFree(fields);
     cudaFree(elementList);
-    cudaFree(distList);
   } else {
     // WIP
   }
@@ -234,24 +232,18 @@ template <int dim> void executor<dim>::initListFields(bool cold) {
     exit(1);
   }
   su2Element tmpParts[partCount];
-  double tmpDists[disc.getDistanceCount()];
   disc.loadElements(partFile, &tmpParts[0]);
-  disc.loadDistances(&tmpParts[0], tmpDists);
 
   if (useCuda) {
     cudaMalloc(&elementList, sizeof(su2Element) * partCount);
     cudaMemcpy(elementList, &tmpParts[0], sizeof(su2Element) * partCount,
                cudaMemcpyHostToDevice);
 
-    cudaMalloc(&distList, sizeof(double) * disc.getDistanceCount());
-    cudaMemcpy(distList, &tmpDists[0], sizeof(double) * disc.getDistanceCount(),
-               cudaMemcpyHostToDevice);
-
     int blockCount =
         ((action.getSiteCount()) + CUDA_BLOCK_SIZE - 1) / CUDA_BLOCK_SIZE;
 
     kernel_initListFields<dim><<<blockCount, CUDA_BLOCK_SIZE>>>(
-        (su2ListElement *)fields, action.getSiteCount(), cold, disc, distList,
+        (su2ListElement *)fields, action.getSiteCount(), cold, disc,
         elementList);
 
   } else { // WIP

@@ -33,14 +33,14 @@ class executor:
                       dataDir,
                       verbose=True,
                       partition=None,
-                      partitionFile=None,
+                      partitionOpt=None,
                       hits=None,
                       multiSweep=None,
                       cold=False):
 
-        latSize, betas, deltas, sweeps, partition, partitionFile, hits, cold, multiSweep = self.fixParameters(
+        latSize, betas, deltas, sweeps, partition, partitionOpt, hits, cold, multiSweep = self.fixParameters(
             [
-                latSize, betas, deltas, sweeps, partition, partitionFile, hits,
+                latSize, betas, deltas, sweeps, partition, partitionOpt, hits,
                 cold, multiSweep
             ])
 
@@ -58,8 +58,8 @@ class executor:
             ]
             if partition[i] != None:
                 callList.append(partition[i])
-                if partitionFile[i] != None:
-                    callList.append(partitionFile[i])
+                if partitionOpt[i] != None:
+                    callList.append(partitionOpt[i])
             if hits[i] != None:
                 callList.append("--hits")
                 callList.append(str(hits[i]))
@@ -82,14 +82,14 @@ class executor:
                       dataDir,
                       verbose=True,
                       partition=None,
-                      partitionFile=None,
+                      partitionOpt=None,
                       hits=None,
                       multiSweep=None,
                       cold=False):
 
-        latSize, betas, deltas, sweeps, partition, partitionFile, hits, cold, multiSweep = self.fixParameters(
+        latSize, betas, deltas, sweeps, partition, partitionOpt, hits, cold, multiSweep = self.fixParameters(
             [
-                latSize, betas, deltas, sweeps, partition, partitionFile, hits,
+                latSize, betas, deltas, sweeps, partition, partitionOpt, hits,
                 cold, multiSweep
             ])
 
@@ -115,8 +115,8 @@ class executor:
 
                     if partition[i] != None:
                         callList.append(partition[i])
-                        if partitionFile != None:
-                            callList.append(partitionFile[i])
+                        if partitionOpt != None:
+                            callList.append(partitionOpt[i])
 
                     if hits[i] != None:
                         callList.append("--hits")

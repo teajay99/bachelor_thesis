@@ -64,7 +64,8 @@ def generateLattice(subdivs, outFile):
             #print(vertices[i])
             vertices[i][j] /= norm
 
-    qp.plotPoints(vertices)
+    #qp.plotPoints(vertices)
+    print(len(vertices))
 
     file = open(outFile, "w")
     for i in range(len(vertices)):
@@ -76,7 +77,10 @@ def generateLattice(subdivs, outFile):
 
 def main():
     N = 1
-    generateLattice(N, "../../numerics/testPart.csv")
+    for N in range(10):
+        #generateLattice(N, "../../numerics/testPart.csv")
+        vCount = 16 + (8 * (N**3)) + (24 * (N**2)) + (32 * N)
+        print(N,":",vCount)
 
 
 if __name__ == "__main__":

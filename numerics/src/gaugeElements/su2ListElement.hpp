@@ -7,10 +7,9 @@
 class su2ListElement : public su2Element {
 public:
   __device__ __host__ su2ListElement(discretizer iDisc,
-                                     su2Element *iElementList,
-                                     double *iDistList) {
+                                     su2Element *iElementList) {
     disc = iDisc;
-    distList = iDistList;
+
     elementList = iElementList;
     index = 0;
 
@@ -20,10 +19,8 @@ public:
   };
 
   __device__ __host__ su2ListElement(int iIndex, discretizer iDisc,
-                                     su2Element *iElementList,
-                                     double *iDistList) {
+                                     su2Element *iElementList) {
     disc = iDisc;
-    distList = iDistList;
     elementList = iElementList;
     index = iIndex;
 
@@ -37,35 +34,26 @@ public:
   su2ListElement randomize(double delta, std::mt19937 &gen) {
     std::uniform_int_distribution<> dist(0, disc.getElementCount() - 1);
 
-    int n = 0;
-
-    do {
-      n = dist(gen);
-    } while (disc.getDistance(distList, n, index) > delta);
+    int n = dist(gen);
     return randomize(n);
   };
 
   __device__ su2ListElement randomize(double delta,
                                       CUDA_RAND_STATE_TYPE *state) {
-    int n = 0;
+    int n = disc.getElementCount();
+    while (n == disc.getElementCount()) {
+      double t = curand_uniform_double(state) * disc.getElementCount();
+      n = (int)t;
+    }
 
-    do {
-      int newInt = disc.getElementCount();
-      while (newInt == disc.getElementCount()) {
-        double t = curand_uniform_double(state) * disc.getElementCount();
-        newInt = (int)t;
-      }
-      n = newInt;
-    } while (disc.getDistance(distList, n, index) > delta);
     return randomize(n);
   };
 
 private:
   __device__ __host__ su2ListElement randomize(int newIdx) {
-    return su2ListElement(newIdx, disc, elementList, distList);
+    return su2ListElement(newIdx, disc, elementList);
   };
 
-  double *distList;
   su2Element *elementList;
   discretizer disc;
   int index;

@@ -5,7 +5,7 @@ from math import sin, cos, acos
 import math
 import mpmath
 from pynverse import inversefunc
-import quatternionPlotter as qp
+#import quatternionPlotter as qp
 
 
 def generateLattice(N, outFile, includeAdjoint=False):
