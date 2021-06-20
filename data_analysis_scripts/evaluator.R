@@ -11,7 +11,12 @@ read_file <- function(path, thermTime) {
   }
   data = csvfile[, c("V2")]
   data = data[-(1:thermTime)]
-  out = uwerrprimary(data)
+  out <- tryCatch({
+    uwerrprimary(data)
+  }, error = function(cond) {
+    return(list(value = mean(data), dvalue = 0)
+)
+  })
   return(list(val = out$value, err = out$dvalue))
 }
 

@@ -46,7 +46,7 @@ def generateLattice(N, outFile, includeAdjoint=False):
     if includeAdjoint:
         outRange = 2 * N
 
-    qp.plotPoints(out[:outRange])
+    #qp.plotPoints(out[:outRange])
 
     file = open(outFile, "w")
     for i in range(outRange):
