@@ -8,6 +8,7 @@ import matplotlib as mpl
 from uncertainties import ufloat
 from scipy.optimize import curve_fit
 from lmfit import minimize
+from matplotlib.ticker import Locator
 
 #Locale settings
 import locale
@@ -17,6 +18,75 @@ locale.setlocale(locale.LC_NUMERIC, "de_DE")
 #from uncertainties.umath import *
 
 fig, ax = (0, 0)
+
+
+# Class stolen from https://stackoverflow.com/questions/20470892/how-to-place-minor-ticks-on-symlog-scale
+class MinorSymLogLocator(Locator):
+    """
+    Dynamically find minor tick positions based on the positions of
+    major ticks for a symlog scaling.
+    """
+    def __init__(self, linthresh, nints=10):
+        """
+        Ticks will be placed between the major ticks.
+        The placement is linear for x between -linthresh and linthresh,
+        otherwise its logarithmically. nints gives the number of
+        intervals that will be bounded by the minor ticks.
+        """
+        self.linthresh = linthresh
+        self.nintervals = nints
+
+    def __call__(self):
+        # Return the locations of the ticks
+        majorlocs = self.axis.get_majorticklocs()
+
+        if len(majorlocs) == 1:
+            return self.raise_if_exceeds(np.array([]))
+
+        # add temporary major tick locs at either end of the current range
+        # to fill in minor tick gaps
+        dmlower = majorlocs[1] - majorlocs[
+            0]  # major tick difference at lower end
+        dmupper = majorlocs[-1] - majorlocs[
+            -2]  # major tick difference at upper end
+
+        # add temporary major tick location at the lower end
+        if majorlocs[0] != 0. and (
+            (majorlocs[0] != self.linthresh and dmlower > self.linthresh) or
+            (dmlower == self.linthresh and majorlocs[0] < 0)):
+            majorlocs = np.insert(majorlocs, 0, majorlocs[0] * 10.)
+        else:
+            majorlocs = np.insert(majorlocs, 0, majorlocs[0] - self.linthresh)
+
+        # add temporary major tick location at the upper end
+        if majorlocs[-1] != 0. and (
+            (np.abs(majorlocs[-1]) != self.linthresh
+             and dmupper > self.linthresh) or
+            (dmupper == self.linthresh and majorlocs[-1] > 0)):
+            majorlocs = np.append(majorlocs, majorlocs[-1] * 10.)
+        else:
+            majorlocs = np.append(majorlocs, majorlocs[-1] + self.linthresh)
+
+        # iterate through minor locs
+        minorlocs = []
+
+        # handle the lowest part
+        for i in range(1, len(majorlocs)):
+            majorstep = majorlocs[i] - majorlocs[i - 1]
+            if abs(majorlocs[i - 1] + majorstep / 2) < self.linthresh:
+                ndivs = self.nintervals
+            else:
+                ndivs = self.nintervals - 1.
+
+            minorstep = majorstep / ndivs
+            locs = np.arange(majorlocs[i - 1], majorlocs[i], minorstep)[1:]
+            minorlocs.extend(locs)
+
+        return self.raise_if_exceeds(np.array(minorlocs))
+
+    def tick_values(self, vmin, vmax):
+        raise NotImplementedError('Cannot get tick locations for a '
+                                  '%s type.' % type(self))
 
 
 def getCRS(data, model, yNoise, ddof):
@@ -97,6 +167,17 @@ def setLogScale(x, y):
         plt.yscale("log")
 
 
+def setSymLogScale(x, y, xthresh=1, ythresh=1):
+    if x:
+        plt.xscale("symlog", linthresh=xthresh, subs=[2, 3, 4, 5, 6, 7, 8, 9])
+        # ax.get_xaxis().set_minor_formatter(mpl.ticker.ScalarFormatter())
+
+    if y:
+        plt.yscale("symlog", linthresh=ythresh)
+        yaxis = plt.gca().yaxis
+        yaxis.set_minor_locator(MinorSymLogLocator(ythresh))
+
+
 def export(fname, legndLoc='best', legend=True, width=None):
     if legend:
         plt.legend(loc=legndLoc, fontsize=10, frameon=True)
@@ -153,23 +234,24 @@ def plotErrPoints(x, y, label="", clr='k'):
 
 
 def plot1DErrPoints(x, y, label="", clr='k'):
-    ax.errorbar(x,
-                np.array([i.n for i in y]),
-                yerr=np.array([i.std_dev for i in y]),
-                zorder=3,
-                fmt='k_',
-                #marker="_",
-                ecolor=clr,
-                mec=clr,
-                elinewidth=0.5,
-                capsize=2,
-                capthick=0.5,
-                barsabove=True,
-                label=label)
+    ax.errorbar(
+        x,
+        np.array([i.n for i in y]),
+        yerr=np.array([i.std_dev for i in y]),
+        zorder=3,
+        fmt='k_',
+        #marker="_",
+        ecolor=clr,
+        mec=clr,
+        elinewidth=0.5,
+        capsize=2,
+        capthick=0.5,
+        barsabove=True,
+        label=label)
 
 
-def plotPoints(x, y, label="", clr='k',marker="+"):
-    ax.scatter(x, y, label=label, color=clr,marker=marker,s=20)
+def plotPoints(x, y, label="", clr='k', marker="+"):
+    ax.scatter(x, y, label=label, color=clr, marker=marker, s=20)
 
 
 def plotImage(img, pixel_length, cmap='jet', cbarlbl=None):
@@ -299,6 +381,12 @@ def printTeXTable(a, head=None):
     print(getAsTeXTable(a, head=head))
 
 
+def cleanExponents(inp):
+    out = re.sub(r'e\+0*(\d*)\s', r' \\cdot 10^{\1}', inp)
+    out = re.sub(r'e\-0*(\d*)\s', r' \\cdot 10^{- \1}', out)
+    return out
+
+
 def getAsTeXTable(a, head=None):
     if len(a.shape) != 2:
         return -1
@@ -318,4 +406,4 @@ def getAsTeXTable(a, head=None):
     output = output.replace("+/-", " \\pm ")
     output = output.replace(".", ",")
     output += "\\hline\n\\end{tabular}"
-    return output
+    return cleanExponents(output)

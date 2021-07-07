@@ -9,7 +9,6 @@
 \date{\today}
 
 
-
 \begin{document}
 \maketitle
 
@@ -22,22 +21,20 @@ Some fancy abstract
 
 \newcommand{\SUTwo}{$\mathrm{SU}(2)$ }
 
-
-
 %\section{Zielsetzung}
 
 \section{Introduction}
-\input{introduction/chapter}
+\import{chap_introduction/}{chapter.tex}
 
 \section{Discretisations of \SUTwo}
-\input{chap_discrete_su_2/chapter}
+\import{chap_discrete_su_2/}{chapter.tex}
 
 \newpage
 \section{Monte Carlo Method}
-\input{chap_monte_carlo/chapter}
+\import{chap_monte_carlo/}{chapter.tex}
 
 \section{Results}
-\input{chap_results/chapter}
+\import{chap_results/}{chapter.tex}
 
 \printbibliography
 

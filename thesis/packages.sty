@@ -23,6 +23,11 @@
 \usepackage{multirow}
 \usepackage{makecell}
 
+\usepackage{algorithm,algcompatible}
+\renewcommand{\COMMENT}[2][.5\linewidth]{%
+ \leavevmode\hfill\makebox[#1][l]{//~#2}}
+
+
 \usepackage{tikz}
 \usetikzlibrary{arrows}
 \usetikzlibrary{decorations.markings}

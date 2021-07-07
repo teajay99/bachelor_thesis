@@ -1,10 +1,46 @@
-The subject of this work will be a lattice gauge theory with gauge group \SUTwo. The continous action of a pure \SUTwo gauge theory, as found for e.g. in \cite{Peskin:1995} is given by
+The action of a pure gauge theory of gauge group $G$ is given by
+
+\begin{align*}
+ S_G                                   & = -\frac{1}{4} \int \mathrm{d}^4 x  \sum_i F_{\mu \nu}^{i} (x) F^{i \, \, \mu \nu} (x) \\
+ \textrm{with} \qquad  F_{\mu \nu}^{a} & =  \partial_\mu A^{a}_\nu - \partial_\nu A^{a}_\mu  + g f^{abc} A^{b}_\mu A^{c}_\nu
+\end{align*}
+with gauge field $A_\mu^a$, coupling constant $g$ and structure constants $f^{abc}$\cite{Peskin:1995}. In order to treat such theory numerically one first transitions to imaginary time. This is done by $x^0 \rightarrow -i x_4$ which leads to $S_G \rightarrow i S_G^{(\textrm{eucl.})}$ with
+
+\begin{align*}
+ S_G^{(\textrm{eucl.})} & = \frac{1}{4} \int \mathrm{d}^4 x  \sum_{i,\mu,\nu} F_{\mu \nu}^{(i)} (x) F_{\mu \nu}^{(i)} (x)  \textrm{.} \\
+\end{align*}
+
+Furthermore one introduces a four dimensional space-time lattice with periodic boundary conditions and lattice spacing $a$. This is achieved by the following replacements:
+
+\begin{align*}
+ x^\mu               & \rightarrow a \, n^\mu                \\
+ \int \mathrm{d}^4 x & \rightarrow a^4 \sum_n                \\
+ A_\mu (x)           & \rightarrow A_\mu(an) \equiv A_\mu(n) \textrm{.}
+\end{align*}
+
+\begin{align*}
+ U_\mu(n) = \exp \left( i g a A_\mu(n) \right) \in G
+\end{align*}
+
+\begin{align*}
+ U_{\mu \nu}(n) & = U_\mu(n) \, U_\nu(n+e_\mu) \, U^\dagger_\mu (n + e_\nu) U^\dagger_\nu(n) \\
+                & = ...                                                                      \\
+                & = \exp \left( iga^2 F_{\mu \nu} \right) + \mathcal{O}(a^3)
+\end{align*}
+
+
 
 
 \begin{align*}
-\frac{1}{4} \sum_i F_{\mu \nu}^{(i)} F^{(i) \mu \nu} \textrm{.}
+ U_{\mu \nu} &= 1 + i g a^2 F_{\mu \nu} + \mathcal{O}(a^3) \\
+ \Leftrightarrow \qquad F_{\mu \nu} &=
 \end{align*}
 
+The generators of \SUTwo can be written as $\frac{\sigma^i}{2}$ in terms of the pauli matrices $\sigma^i$. As
+\begin{align*}
+ \left[ \frac{\sigma^a}{2}, \frac{\sigma^b}{2} \right] & = \frac{i}{2} \varepsilon^{abc} \, \sigma^c \textrm{.}
+\end{align*}
+holds, the structure constants are given by $f^{abc} = \varepsilon^{abc}$.
 
 
 
