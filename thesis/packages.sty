@@ -6,7 +6,7 @@
 %\usepackage[english,ngerman]{babel}
 \usepackage{amssymb,amscd,amsmath,amstext,amsfonts,hyperref,booktabs}
 \usepackage{upgreek}
-\usepackage[separate-uncertainty=true,decimalsymbol=comma]{siunitx}
+\usepackage[separate-uncertainty=true]{siunitx}
 \usepackage{listings}
 \usepackage{color}
 \usepackage{wrapfig}
@@ -22,11 +22,13 @@
 \usepackage{gensymb}
 \usepackage{multirow}
 \usepackage{makecell}
+\usepackage{bbold}
+\usepackage{tabu}
 
 \usepackage{algorithm,algcompatible}
 \renewcommand{\COMMENT}[2][.5\linewidth]{%
  \leavevmode\hfill\makebox[#1][l]{//~#2}}
-
+\algnewcommand\RETURN{\State \textbf{return} }
 
 \usepackage{tikz}
 \usetikzlibrary{arrows}

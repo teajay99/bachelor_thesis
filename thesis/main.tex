@@ -8,6 +8,9 @@
 \author{Timo Jakobs \\\\ \textbf{University of Bonn}}
 \date{\today}
 
+\newcommand{\SUTwo}{$\mathrm{SU}(2)$}
+
+\tabulinesep=1.2mm
 
 \begin{document}
 \maketitle
@@ -19,22 +22,23 @@ Some fancy abstract
 \tableofcontents
 \newpage
 
-\newcommand{\SUTwo}{$\mathrm{SU}(2)$ }
-
-%\section{Zielsetzung}
-
 \section{Introduction}
 \import{chap_introduction/}{chapter.tex}
 
 \section{Discretisations of \SUTwo}
+\label{sec:discSu2}
 \import{chap_discrete_su_2/}{chapter.tex}
 
-\newpage
 \section{Monte Carlo Method}
 \import{chap_monte_carlo/}{chapter.tex}
 
 \section{Results}
+\label{sec:results}
 \import{chap_results/}{chapter.tex}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\import{chap_conclusion/}{chapter.tex}
 
 \printbibliography
 

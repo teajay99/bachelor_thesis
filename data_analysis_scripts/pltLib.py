@@ -169,8 +169,9 @@ def setLogScale(x, y):
 
 def setSymLogScale(x, y, xthresh=1, ythresh=1):
     if x:
-        plt.xscale("symlog", linthresh=xthresh, subs=[2, 3, 4, 5, 6, 7, 8, 9])
-        # ax.get_xaxis().set_minor_formatter(mpl.ticker.ScalarFormatter())
+        plt.xscale("symlog", linthresh=xthresh)
+        xaxis = plt.gca().xaxis
+        xaxis.set_minor_locator(MinorSymLogLocator(xthresh))
 
     if y:
         plt.yscale("symlog", linthresh=ythresh)
@@ -178,12 +179,12 @@ def setSymLogScale(x, y, xthresh=1, ythresh=1):
         yaxis.set_minor_locator(MinorSymLogLocator(ythresh))
 
 
-def export(fname, legndLoc='best', legend=True, width=None):
+def export(fname, legndLoc='best', legend=True, width=None, height=1.0):
     if legend:
         plt.legend(loc=legndLoc, fontsize=10, frameon=True)
     if width != None:
         fig.set_size_inches(width * 6.49733,
-                            width * 6.49733 * (5.0**.5 - 1.0) / 2.0)
+                            height * width * 6.49733 * (5.0**.5 - 1.0) / 2.0)
         #6.49733
 
     plt.savefig(fname, dpi=400, bbox_inches="tight")
@@ -208,14 +209,22 @@ def startNewPlot(xText, yText, titleText, grid=True):
     #plt.legend(loc='upper right',fontsize=12,frameon=True)
 
 
-def plotErrPointsAbs(x, y, xNoise, yNoise, label="", clr='k'):
+def plotErrPointsAbs(x,
+                     y,
+                     xNoise,
+                     yNoise,
+                     label="",
+                     clr='k',
+                     markersize=5,
+                     marker="+"):
     ax.errorbar(x,
                 y,
                 yerr=yNoise,
                 xerr=xNoise,
                 zorder=3,
                 fmt='k.',
-                markersize=0,
+                markersize=markersize,
+                marker=marker,
                 ecolor=clr,
                 elinewidth=0.5,
                 capsize=2,

@@ -1,0 +1,64 @@
+\subsection{Validation of the Continuous Case}
+
+Finally it is time to code up the simulations. This was done in \texttt{C++} making use of Nvidia's \texttt{CUDA} library to allow for parallel execution on GPUs.
+
+First up we need to figure out how to choose the $\delta$ parameter when generating the transition elements $V$ in eq. \ref{eq:transitionV}. The exact choice is not critical as it will just affect the uncertainties and not the measured quantities themselves.
+
+To evaluate how well $\delta$ is chosen one can take a look at the acceptance rate, i.e. the ratio of line \ref{code:metroMonteIfCond} in algorithm \ref{alg:metroMonte} evaluating to \texttt{true} and the total number of evaluations.
+
+\cite{Creutz:1981}
+
+\subsection{Phase Transitions}
+
+\begin{figure}[!hbt]
+ \centering
+ \input{RegularPolytopes.pgf}
+ \caption{Systematic deviations for $\beta = 0.1$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{Subgroups.pgf}
+ \caption{Systematic deviations for $\beta = 0.1$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{Volleyball.pgf}
+ \caption{Systematic deviations for $\beta = 0.5$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{Fibonacci-I.pgf}
+ \caption{Systematic deviations for $\beta = 1.0$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{Fibonacci-II.pgf}
+ \caption{Systematic deviations for $\beta = 2.0$}
+\end{figure}
+
+
+
+\begin{figure}[!hbt]
+ \centering
+ \input{systemCheck0.1.pgf}
+ \caption{Systematic deviations for $\beta = 0.1$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{systemCheck0.5.pgf}
+ \caption{Systematic deviations for $\beta = 0.5$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{systemCheck1.0.pgf}
+ \caption{Systematic deviations for $\beta = 1.0$}
+\end{figure}
+\begin{figure}[!hbt]
+ \centering
+ \input{systemCheck2.0.pgf}
+ \caption{Systematic deviations for $\beta = 2.0$}
+\end{figure}
+
+
+Some text that is really verry much super important and totally relevant and not at all here to fill a Page
+\subsection{Systematic Deviations}
