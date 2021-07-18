@@ -95,8 +95,8 @@ def fitDeltas():
                       hitRates + 0.5,
                       clr="b",
                       label="$\\frac{N_{\\textrm{acc}}}{N_{\\textrm{hit}}}$")
-    pltLib.plotFitFunc(fitFunc, p, np.min(betas), np.max(betas), log=True,label="Fit")
-    pltLib.export("export/calibHitRate.pgf",width=0.8)
+    pltLib.plotFitFunc(fitFunc, p, np.min(betas), np.max(betas), log=True,label="$\\textrm{Fit}$")
+    pltLib.export("export/calibHitRate.pgf",width=0.54)
     pltLib.endPlot()
 
 

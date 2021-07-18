@@ -4,11 +4,11 @@
 \usepackage{packages}
 
 
-\title{Bachelorarbeit}
+\title{Bachelor Thesis}
 \author{Timo Jakobs \\\\ \textbf{University of Bonn}}
 \date{\today}
 
-\newcommand{\SUTwo}{$\mathrm{SU}(2)$}
+\newcommand{\SUTwo}{$\mathrm{SU}(2)$\xspace}
 
 \tabulinesep=1.2mm
 
@@ -16,20 +16,23 @@
 \maketitle
 
 \begin{abstract}
-Some fancy abstract
+In this work we will take a look at different approaches to approximating the group \SUTwo in its function as the gauge group of a quantum field theory. This includes finite subgroups of \SUTwo like the popular icosahedral approximation, four-dimensional versions of the platonic solids and geodesic polytopes, as well as a generalized fibonacci lattice. In order to test these approximations Metropolis Monte Carlo simulations were implemented and run.
 \end{abstract}
 
 \tableofcontents
 \newpage
 
-\section{Introduction}
+
+
+
+\section{The lattice action}
 \import{chap_introduction/}{chapter.tex}
 
 \section{Discretisations of \SUTwo}
 \label{sec:discSu2}
 \import{chap_discrete_su_2/}{chapter.tex}
 
-\section{Monte Carlo Method}
+\section{Metropolis Monte Carlo Method}
 \import{chap_monte_carlo/}{chapter.tex}
 
 \section{Results}
@@ -43,7 +46,8 @@ Some fancy abstract
 \printbibliography
 
 \begin{appendix}
-
+\section{Recorded Data}
+%\import{appendix_raw_data/}{raw_data.tex}
 \end{appendix}
 
 \end{document}

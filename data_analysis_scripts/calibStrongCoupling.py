@@ -55,12 +55,11 @@ def main():
     #         ])
     #     ]).transpose())
 
-    pltLib.startNewPlot("$\\beta$", "$W(1,1) - \\frac{\\beta}{4}$", "")
+    pltLib.startNewPlot("$\\beta$", "$P - \\beta/4$", "")
     #pltLib.setLogScale(True, False)
-    pltLib.plot1DErrPoints(betas[:20],
-                           (plaquettes - (betas / 4))[:20],
+    pltLib.plotPoints(betas[:18], [i.n for i in (plaquettes - (betas / 4))[:18]],
                            label="GPU Data(" + str((4 * sweeps) - thermTime) +
-                           " sweeps)")
+                           " sweeps)",s=10)
     # pltLib.plot1DErrPoints(betas,
     #                        refPlaquettes - (betas / 4),
     #                        label="Ref. Data (" + str(sweeps - thermTime) +
@@ -68,10 +67,29 @@ def main():
     #                        clr="r")
     pltLib.plotFunc(helpers.strongCouplingExp,
                     0.02,
-                    1.35,
+                    1.4,
                     log=True,
                     label="Strong Coupling Expansion")
-    pltLib.export("export/calibStrongCoupling.pgf", width=0.8)
+    pltLib.export("export/calibStrongCoupling.pgf",
+                  width=0.54 / 1.2,
+                  height=1.2,
+                  legend=False)
+    pltLib.endPlot()
+
+    pltLib.startNewPlot("$\\beta$", "$P$", "")
+    pltLib.plotPoints(betas,
+                           [i.n for i in plaquettes],
+                           label="GPU Data(" + str((4 * sweeps) - thermTime) +
+                           " sweeps)",s=10)
+    # pltLib.plotFunc(helpers.strongCouplingExp,
+    #                 0.02,
+    #                 1.4,
+    #                 log=True,
+    #                 label="Strong Coupling Expansion")
+    pltLib.export("export/referenceDataSet.pgf",
+                  width=0.54 / 1.08,
+                  height=1.08,
+                  legend=False)
     pltLib.endPlot()
 
 

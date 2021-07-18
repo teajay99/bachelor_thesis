@@ -52,7 +52,7 @@ There are numerous ways of generating lattice configurations $\{ \boldsymbol{U}^
   \ENDFOR
  \end{algorithmic}
 \end{algorithm}
-As an initial configuration one usually either chooses a cold starting configuration, i.e. $U_\mu(n)=1$ or a hot one where every link variable is set to a random element of \SUTwo. After that it takes numerous Iterations until the configuration reaches \emph{thermal equilibrium}. A common way to figure out how many iterations this takes, is to run the simulation once with a hot and once with a cold start, and see where the measured values start to agree.
+As an initial configuration one usually either chooses a cold starting configuration, i.e. {$U_\mu(n)=1$} or a hot one where every link variable is set to a random element of \SUTwo. After that it takes numerous Iterations until the configuration reaches \emph{thermal equilibrium}. A common way to figure out how many iterations this takes, is to run the simulation once with a hot and once with a cold start, and see where the measured values start to agree.
 
 After equilibrium is reached every succesive iteration will generate a new random lattice configuration distributed according to eq. \ref{eq:metroDist}. Therefore $\left\langle \mathcal{O} \right\rangle$ can then be measured to arbitrary precision by simply generating a sufficient amount of lattice configurations. The only limit to this would be the finite precision of flotaing point operations on digital computers, as well as the limited randomness of pseudo random number generators.
 
@@ -77,14 +77,14 @@ This is why one usually aims to generate an element $U_\mu^{\textrm{new}}(n)$ wh
 \begin{align*}
  U_\mu^{\textrm{new}}(n) = V \, U_\mu^{\textrm{old}} (n)
 \end{align*}
-where $V$ is a random group element within the angular distance $\pi \delta$ of $1$. $V$ can be found as
+where $V$ is a random group element within the angular distance $2  \pi \delta$ of $1$. $V$ can be found as
 \begin{align}
  V = \cos (2 \pi d ) + \sin (2 \pi d) \left(i x_1  + j x_2  + k x_3\right)
  \label{eq:transitionV}
 \end{align}
 where $d$ is a random number uniformly distributed within the interval $[0,\delta]$ and $(x_1,x_2,x_3)$ are a random point on $S_2$ found by applying eq. \ref{eq:randSpherePoint}.
 
-The parameter $\delta$ therefore controls how close to $1$ $V$ is, and thus also how close $U^{\textrm{new}}$ to $U^{\textrm{old}}$ is. Generally one a
+%The parameter $\delta$ therefore controls how close $V$ to $1$ is, and thus also how close $U^{\textrm{new}}$ to $U^{\textrm{old}}$ is. Generally one a
 \subsection{Finite Gauge Sets}
 
 Furthermore we need to deal with finite gauge sets $G$. As proposed in \ref{Petcher:1980} one can employ a similar procedure to the continuous case for the finite subgroups of \SUTwo by simply setting $V$ to a random element of the group adjacent to $1$. These would be given by the elements $N(G)$ that minimize the value of $\norm{V - 1}$ and can explicitly found in table \ref{tab:adjacentGenerators}.
@@ -104,9 +104,9 @@ Furthermore we need to deal with finite gauge sets $G$. As proposed in \ref{Petc
  \caption{caption}
  \label{tab:adjacentGenerators}
 \end{table}
-Multiplying them from the left amounts to a small rotation, mapping all vertices to one of their adjacent vertices.
+Multiplying them from the left amounts to a small rotation, mapping all vertices to one of their adjacent vertices.\\
 
-In the case of $C_5$ all five vertices are adjacent to one another, so one can simply pick $U^{\textrm{new}}_\mu$ from one of the four vertices that is not $U^{\textrm{old}}_\mu$.\\
+All other lattices do not posses group properties, so the transition to a neighbouring vertex needs to be implemented in another way. In the case of $C_5$ all five vertices are adjacent to one another, so one can simply pick $U^{\textrm{new}}_\mu$ from one of the four vertices that is not $U^{\textrm{old}}_\mu$.\\
 
 Finding the four adjacent vertices of a given vertex of $C_{120}$ is a less trivial task. As quaternionic multiplication from the left can be interpreted as a rotation in $\mathbb{R}^4$ the construction of $C_{120}$ found in table \ref{tab:polytopes} suggest that the vertices of $C_{120}$ are given by the vertices of $\overline{I}$ as well as four rotated copies of it. In order to keep track of where we are on $C_{120}$ we can therefore just keep track of where we are on $\overline{I}$ (for which we can make use of the group properties) and whether one of the four rotations needs to be applied.
 

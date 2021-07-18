@@ -1,64 +1,183 @@
+Finally it is time to code up the simulations. This was done in \texttt{C++} making use of Nvidia's \texttt{CUDA} library to allow for parallel execution on GPUs. The source code including further documentation can be found at \url{https://github.com/teajay99/bachelor_thesis}.\\
+
 \subsection{Validation of the Continuous Case}
 
-Finally it is time to code up the simulations. This was done in \texttt{C++} making use of Nvidia's \texttt{CUDA} library to allow for parallel execution on GPUs.
+First up we need to figure out how to choose the $\delta$ parameter when generating the transition elements $V$ in eq. \ref{eq:transitionV}. This is a bit of a balancing act, as for bigger values of $\delta$ fewer configuration changes will be accepted, leading to succesive configurations beeing very similar. With small $\delta$ more of the configuration changes will be accepted, but now these changes are very small and the successive configuration will still look a lot like the previous one.
 
-First up we need to figure out how to choose the $\delta$ parameter when generating the transition elements $V$ in eq. \ref{eq:transitionV}. The exact choice is not critical as it will just affect the uncertainties and not the measured quantities themselves.
+The good news is however that the choice of $\delta$ is not critical, as for a sufficient amount of iterations, it will not affect the measured quantities themselves. Correlation between successive configurations however need to be taken into account when estimating the uncertainties of a measured quantity. This was done using the \texttt{uwerrprimary} function from the \emph{R} library \texttt{hadron}.
 
-To evaluate how well $\delta$ is chosen one can take a look at the acceptance rate, i.e. the ratio of line \ref{code:metroMonteIfCond} in algorithm \ref{alg:metroMonte} evaluating to \texttt{true} and the total number of evaluations.
+To evaluate how well $\delta$ is chosen one can take a look at the acceptance rate $\frac{N_{\textrm{acc}}}{N_{\textrm{hit}}}$, i.e. the ratio of line \ref{code:metroMonteIfCond} in algorithm \ref{alg:metroMonte} evaluating to \texttt{true} and the total number of evaluations. A good rule of thumb is to get the acceptance rate to about $\SI{50}{\%}$.
+\begin{figure}[!hbt]
+ \centering
+ \begin{subfigure}[t]{0.49\textwidth}
+  \input{calibHitRate.pgf}
+  \caption{Acceptance Rate Calibration}
+  \label{plot:calibHitRate}
+ \end{subfigure}
+ \begin{subfigure}[t]{0.49\textwidth}
+  \input{referenceDataSet.pgf}
+  \caption{$P(\beta)$ measured on an $8^4$ lattice for $100,000$ iterations. All error bars are significantly smaller than the plotted points and where therefore omitted.}
+  \label{plot:refDataSet}
+ \end{subfigure}
+ \caption{}
+\end{figure}
 
-\cite{Creutz:1981}
+In order to reliably meet this rule a simply zero search for the function
+\begin{align*}
+ f(\delta) & = \left(\frac{N_{\textrm{acc}}}{N_{\textrm{hit}}}\right)(\delta, \beta) - 0.5
+\end{align*}
+was implemented and run for logarithmically spaced values of $\beta$ between $\beta=10^{-2}$ and $\beta = 100$. The results with their corresponding acceptance rate can be found in figure \ref{plot:calibHitRate}. Also a function of the form
+\begin{align*}
+ \delta(\beta) = \min \left(1,\frac{a}{\beta-e} + \frac{b}{(\beta-e)^2} +  \frac{c}{(\beta-e)^3} + \frac{d}{(\beta-e)^4} + f \right)
+\end{align*}
+was fitted to the date with the results reading
+\begin{align*}
+ \begin{array}{rlrl}
+  a= & 0.6391  \qquad \qquad & b= & -1.4378               \\
+  c= & 1.8640  \qquad \qquad & d= & -9.0015 \cdot 10^{-5} \\
+  e= & -0.2495 \qquad \qquad & f= & 0.01396 \textrm{.}    \\
+ \end{array}
+\end{align*}
+The fit looks reasonable, and will therefore be used to serve the values for $\delta$ in the following measurements. A further inspection into e.g. the uncertainties of the fit parameters or error of regression were not done, as again the choice of $\delta$ is not critical, and the fit has no physical implications.\\
+
+Another trick typically implemented to decrease the correlation between successive configurations is to probe each link variable multiple times before moving on to the next one. For all the simulations here this was done $10$ times.\\
+
+The only thing left is to pick is an operator $\mathcal{O}$ to measure. A simple and popular choice here is to go with the average plaquette $P$ measured by
+\begin{align*}
+ P = \frac{1}{\mathcal{N}_P} \sum_{n \in \mathbb{N}^4_N} \sum_{\mu < \nu} \frac{\beta}{2} \mathrm{Tr} \left[ U_{\mu \nu} (n) \right]
+\end{align*}
+where $\mathcal{N}_P = 6 N^4$ denotes the number of different plaquettes for a lattice of size $N^4$.
+
+With this we then ran the continuous case for $\beta \in \{0.1,0.2,\dots,9.8,9.9,10\}$ on an $8^4$ lattice for $104,000$ iterations starting from a hot configuration. The first $4,000$ iterations where treated as thermalization iterations, and the successive $100,000$ will be used as reference data set, when evaluating the approximations of \SUTwo. The obtained values are plotted in figure \ref{plot:refDataSet} and can be found in table \ref{}.
+
+\begin{figure}[!hbt]
+ \begin{subfigure}[t]{0.49\textwidth}
+  \input{calibStrongCoupling.pgf}
+  \caption{}
+  \label{plot:strongCoupling}
+ \end{subfigure}
+ \begin{subfigure}[t]{0.49\textwidth}
+  \input{calibWeakCoupling.pgf}
+  \caption{}
+  \label{plot:weakCoupling}
+ \end{subfigure}
+ \centering
+\end{figure}
+
+In order to verify that the measured data is sound one can take a look at the so called strong coupling expansion given by
+\begin{align*}
+ P_{\textrm{s. c.}}(\beta) = \frac{1}{4} \beta - \frac{1}{96} \beta^3 + \frac{7}{1536} \beta^5 - \frac{31}{23040} & \beta^7 + \frac{4451}{8847360} \beta^9 - \frac{264883}{1486356480} \beta^{11}       \\
+ +                                                                                                                & \frac{403651}{5945425920} \beta^{13} - \frac{1826017873}{68491306598400} \beta^{15}
+\end{align*} as found in \cite{Denbleyker:2008}. As the name suggest, this approximates $P$ for big values of the coupling constant $g$, and therefore small values of $\beta$. As can be seen in figure \ref{plot:strongCoupling} the measured values closely agree with the prediction up to about $\beta = 1.2$.
+
+The same article also gives a weak coupling expansion in $\frac{1}{\beta}$ up to order fifteen for lattice size $6^4$:
+\begin{align*}
+ P(\beta)_{\textrm{w. c.}} & = \sum_{i=1}^{15} \frac{\gamma_i}{(\beta)^i} \textrm{.}
+\end{align*}
+where the coefficients $\gamma_i$ can be found in table \ref{tab:weakCouple}. For this another data set with $10,000$ iterations was generated to account for the smaller lattice size. The results can be found in figure \ref{plot:weakCoupling} and table \ref{apptab:weakCoupling}. The values agree within the error bars up to about $1/\beta = 0.25$, and then start to slowly deviate. Nevertheless they confirm that the simulation is working correctly.
+\begin{table}[!hbt]
+ \centering
+ \begin{tabular}{L || L | L | L | L | L | L | L | L}
+  i        & 1      & 2      & 3      & 4      & 5      & 6     & 7      & 8    \\
+  \hline
+  \gamma_i & 0.7498 & 0.1511 & 0.1427 & 0.1747 & 0.2435 & 0.368 & 0.5884 & 0.98 \\
+ \end{tabular}\\
+ \vspace{5mm}
+ \begin{tabular}{L || L | L | L | L | L | L | L }
+  i        & 9      & 10     & 11    & 12     & 13     & 14     & 15     \\
+  \hline
+  \gamma_i & 1.6839 & 2.9652 & 5.326 & 9.7234 & 17.995 & 33.690 & 63.702 \\
+ \end{tabular}
+ \caption{Weak coupling expansion for a $6^4$ lattice}
+ \label{tab:weakCouple}
+\end{table}
+
+As we now have a solid data set to compare against, we can take a look at the proposed approximations. This will be done in two steps. As pointed out \cite{Petcher:1980} finite gauge groups usually show a phase transition towards higher values of $\beta$. Finding these will therefore be our first concern. In the second step we will also take a look at systematic deviations for some specific values of $\beta$.
 
 \subsection{Phase Transitions}
 
-\begin{figure}[!hbt]
- \centering
- \input{RegularPolytopes.pgf}
- \caption{Systematic deviations for $\beta = 0.1$}
-\end{figure}
+For each of the considered gauge sets $4000$ thermalization iterations were run, and another $3000$ for measurements afterwards. This was repeated twice, once with a hot start, and once with a cold one. The results are plotted in figures \ref{plot:subgroups} to \ref{plot:fibonacciII}. Shown are the deviations $P - P_{\textrm{ref}}$ from the previously generated reference data. The y axis was set to be linear for the interval $[-10^{-3},10^{-3}]$ and logarithmic beyond that, in order to display both the statistical fluctuations, as well as systematic deviations in a meaningful way.\\
 \begin{figure}[!hbt]
  \centering
  \input{Subgroups.pgf}
- \caption{Systematic deviations for $\beta = 0.1$}
+ \caption{Scan in $\beta$ for the finite subgroups of \SUTwo}
+ \label{plot:subgroups}
 \end{figure}
+
+We begin with the finite subgroups $\overline{T}$, $\overline{O}$ and $\overline{I}$ for which the results can be found in figure \ref{plot:subgroups}. Here one can see that for small $\beta$ the measured values mostly agree with the continuous case. Towards bigger values of $\beta$ some systematic deviations show up, until the lattice configuration undergoes a phase transition and \emph{freezes} at $P=1$. To measure $P=1$ all link variables need to be at the same gauge set element. This happens as due the discretization $\Delta S$ now has a minimum value, given by the difference in action of a cold lattice, and one where one of the link variables transitioned to an adjacent vertex. For a given $\beta_{\textrm{ph.}}$ $\Delta S$ then reaches a critical value, such almost all fluctuations will be rejected.
+
+The continuous case does not show this behavior, as for any $\beta$ configuration changes with a sufficiently small $\Delta S$ exist. This therefore always allows for some small fluctuations, decreasing the measured value of $P$. Thus all of the proposed approximations will only be useful for values of $\beta < \beta_{\textrm{ph.}}$.
+
+Another interesting feature of figure \ref{plot:subgroups} are that the cold and hot starting configurations form a hysteresis loop around the phase transition. This indicates, that around $\beta_{\textrm{ph.}}$ multiple semi stable configurations exist. It can be expected that this can be partially fixed, by applying more thermalization iterations. Further testing on $\overline{I}$ however showed, that these loops do not entirely disappear, even for significantly higher numbers of iterations.
+
+In \ref{Petcher:1980} the exact positions of the phase transitions where found to be $\beta_{\textrm{ph.}}(\overline{T}) = 2.15 \pm 0.05$, $\beta_{\textrm{ph.}}(\overline{O}) = 3.25 \pm 0.01$ and $\beta_{\textrm{ph.}}(\overline{I}) = 6.01 \pm 0.01$.
+Estimating these transitions, by taking the center of the corresponding hysteresis loop as $\beta_{\textrm{ph.}}$ and the width of the loop as two standard deviations we can read of $\beta_{\textrm{ph.}}(\overline{T}) = 2.15 \pm 0.15$, $\beta_{\textrm{ph.}}(\overline{O}) = 3.2 \pm 0.1$ and $\beta_{\textrm{ph.}}(\overline{I}) = 5.7 \pm 0.2$. Thus the values for $\overline{T}$ and $\overline{O}$ agree with \ref{Petcher:1980}, while $\beta_{\textrm{ph.}}(\overline{I})$ was measured slightly lower. The reason for this difference is most likely the limited computing power of the time.\\
+\begin{figure}[!hbt]
+ \centering
+ \input{RegularPolytopes.pgf}
+ \caption{Scan in $\beta$ for the remaining regular polytopes}
+ \label{plot:regPolytopes}
+\end{figure}
+
+The remaining regular polytopes $C_5$, $C_{16}$, $C_8$ and $C_{120}$ for which the results can be found in figure \ref{plot:regPolytopes} give a similar picture. As maybe expected due to the small vertex count $C_{5}$, $C_{16}$ and $C_{8}$ performed not that well with the phase transition as low as $\beta_{\textrm{ph.}}(C_5) = 1.2 \pm 0.2$, $\beta_{\textrm{ph.}}(C_{16}) = 1.15 \pm 0.15$ and $\beta_{\textrm{ph.}}(C_{8}) = 1.9 \pm 0.2$.
+$C_{120}$ with it's 600 vertices however pretty much matches \SUTwo for the tested range of $\beta$, with only slight systematic deviations towards the higher values of $\beta$, and no phase transition found.
+
+Another thing to note here is, that beyond the phase transition the values of the hot and cold starting configuration start to diverge again. This is most likely due to there not being enough thermalization iterations for the hot lattice to \emph{freeze}. As we are however not to concerned with that region anyway and the hot and cold starting configuration agree to the left of the phase transition this is not a problem.\\
+
 \begin{figure}[!hbt]
  \centering
  \input{Volleyball.pgf}
- \caption{Systematic deviations for $\beta = 0.5$}
+ \caption{Scan in $\beta$ for Volleyball lattices}
 \end{figure}
+Of the volleyball lattices only $V_1$ showed a phase transition at $\beta_{\textrm{ph.}}(V_1) = 4.95 \pm 0.05 $. This makes sens at it only has $80$ vertices, while $V_2$ already has $240$, $ V_3 $ has $544$ and $ V_4 $ has $1040$. For the remaining lattices however the expected systematic deviations prominently show up for $\beta > 2$.
+
 \begin{figure}[!hbt]
  \centering
  \input{Fibonacci-I.pgf}
- \caption{Systematic deviations for $\beta = 1.0$}
+ \caption{Scan in $\beta$ for Fibonacci lattices on \SUTwo (Part I)}
+ \label{plot:fibonacciI}
 \end{figure}
 \begin{figure}[!hbt]
  \centering
  \input{Fibonacci-II.pgf}
- \caption{Systematic deviations for $\beta = 2.0$}
+ \caption{Scan in $\beta$ for Fibonacci lattices on \SUTwo (Part II)}
+ \label{plot:fibonacciII}
 \end{figure}
 
+Lastly we take a look at the fibonacci lattices. These were tested for lattice sizes  $8$, $16$, $32$, $64$, $128$, $256$ and $512$. The results can be found in figures \ref{plot:fibonacciI} and \ref{plot:fibonacciII}. Reading of the positions of the phase transitions in the same way as before is not really possible here, as for lattice sizes bigger than $16$ the hot configurations didn't really freeze. This is most likely due to the inefficient generation of new random elements. Nevertheless we can put a lower bound on $\beta_{\textrm{ph.}}$ by taking a look at where cold starting configuration transitions. With this we get $\beta_{\textrm{ph.}}(F_8) = 1.55 \pm 0.25$, $\beta_{\textrm{ph.}}(F_16) = 2.55 \pm 0.35 $, $\beta_{\textrm{ph.}}(F_{32}) > 3.5 $, $\beta_{\textrm{ph.}}(F_{64}) > 5.2 $ and $\beta_{\textrm{ph.}}(F_{128}) > 7.8$. $F_{256}$ and $F_{512}$ reproduced the reference data set for the whole tested range of $\beta$, with only slight systematic deviations for $F_{256}$ towards higher $\beta$. This is probably indicating an approaching phase transition beyond the measured range.
 
+Surprisingly the fibonacci lattices seem to perform significantly better than e.g. the subgroups in terms of phase transitions. $F_{32}$, shows systematic deviations at around $\beta = 2$, similar to $\overline{O}$. The actual phase transition of $F_{32}$ however happens for a slightly higher value of $\beta$, although it only has two thirds of the vertices. In the same way $\overline{I}$ is significantly outperformed by $F_{128}$ with only eight vertices more. \\
+
+To get a better idea of how $\beta_{\textrm{ph.}}$ scales with the lattice size $n$ for the fibonacci lattice we ran another scan for $40$ logarithmically spaced lattice sizes between $n=8$ and $n=256$. For this $\beta$ was increased in steps of $0.1$ until $P-P_{\textrm{ref}} > 4 \cdot 10^{-2}$. This was chosen as the criterion for the lattice to be frozen, in which case we moved on to a larger lattice and continued. To deal with the inefficiencies of the random element generation for the fibonacci lattice $20,000$ thermalization iterations were run, with $1000$ measuring iterations.
+
+The results can be found in figure \ref{}. This should however be understood as an approximation, as the criterion for the lattice freezing, could have easily been picked differently, varying the results. We went with the threshold of $P-P_{\textrm{ref}} > 4 \cdot 10^{-2}$ as it covers all the previously observed phase transition reasonably well.
+
+\subsection{Systematic Deviations}
+\FloatBarrier
+
+Lastly we took a more detailed look at some systematic deviations that might occur for the different approximations of \SUTwo. For this we ran another reference simulation for $\beta = 0.1$ and $\beta = 1.0$ with $10^6$ iterations, and then tested the approximations with $10^5$ iterations. The results can be found in figures \ref{plot:systemBeta01} and \ref{plot:systemBeta10}. For $\beta=0.1$ only $C_5$ and $C_{16}$ as well as $F_{8}$ and $F_{16}$ significantly deviate from the continuous case.
+
+For $\beta=1$ also $\overline{T}$ and $C_8$ started to show significant deviations. The slightly higher deviation for $V_4$ turned out to just be a statistical fluctuation, as verified by running the same test for different values of $\beta$.
 
 \begin{figure}[!hbt]
  \centering
  \input{systemCheck0.1.pgf}
  \caption{Systematic deviations for $\beta = 0.1$}
-\end{figure}
-\begin{figure}[!hbt]
- \centering
- \input{systemCheck0.5.pgf}
- \caption{Systematic deviations for $\beta = 0.5$}
+ \label{plot:systemBeta01}
 \end{figure}
 \begin{figure}[!hbt]
  \centering
  \input{systemCheck1.0.pgf}
  \caption{Systematic deviations for $\beta = 1.0$}
-\end{figure}
-\begin{figure}[!hbt]
- \centering
- \input{systemCheck2.0.pgf}
- \caption{Systematic deviations for $\beta = 2.0$}
+ \label{plot:systemBeta10}
 \end{figure}
 
+The deviations for $F_8$ and $F_{16}$ at $\beta=0.1$ are quite noteworthy, as contrary to the behavior discussed for phase transitions the eight vertices of $C_{16}$ seem are a lot closer to the reference data set, while the $16$ vertices of $C_8$ do not even show any significant deviation. As at $\beta=1$ one is already approaching the phase transitions for these lattices. Therefore this changes with now the fibonacci lattices being closer to the reference data set, for similar vertex count.
 
-Some text that is really verry much super important and totally relevant and not at all here to fill a Page
-\subsection{Systematic Deviations}
+This can be explained as follows. For very small values of $\beta$ the acceptance rate will be very high. This means the behavior of the monte carlo algorithm is very close to just picking random elements from the gauge set, and averaging them. As most of the lattices are constructed from a symmetry most of them are \emph{balanced} in the sense that
+\begin{align*}
+  \sum_{v \in \{\textrm{vertices}\}} v = 0
+\end{align*}
+holds for them. This however is not the case for the fibonacci lattice, which is why for small $\beta$, such a lack of \emph{balance} shows up as a systematic deviation. With increasing the size of the fibonacci lattices these effects however decrease.
+
+\FloatBarrier

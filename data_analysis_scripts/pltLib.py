@@ -12,8 +12,9 @@ from matplotlib.ticker import Locator
 
 #Locale settings
 import locale
+import re
 # Set to German locale to get comma decimal separater
-locale.setlocale(locale.LC_NUMERIC, "de_DE")
+# locale.setlocale(locale.LC_NUMERIC, "de_DE")
 
 #from uncertainties.umath import *
 
@@ -193,7 +194,7 @@ def export(fname, legndLoc='best', legend=True, width=None, height=1.0):
 def startNewPlot(xText, yText, titleText, grid=True):
     global fig, ax
     #fig,ax = (0,0)
-    mpl.rcParams['axes.formatter.use_locale'] = True
+    #mpl.rcParams['axes.formatter.use_locale'] = True
     mpl.rcParams['font.size'] = 10
     mpl.rcParams['text.usetex'] = True
     # plt.rcParams['text.latex.preamble'] = [
@@ -259,8 +260,8 @@ def plot1DErrPoints(x, y, label="", clr='k'):
         label=label)
 
 
-def plotPoints(x, y, label="", clr='k', marker="+"):
-    ax.scatter(x, y, label=label, color=clr, marker=marker, s=20)
+def plotPoints(x, y, label="", clr='k', marker="+",s=20):
+    ax.scatter(x, y, label=label, color=clr, marker=marker, s=s)
 
 
 def plotImage(img, pixel_length, cmap='jet', cbarlbl=None):
@@ -413,6 +414,6 @@ def getAsTeXTable(a, head=None):
         output += " \\\\" + "\n"
 
     output = output.replace("+/-", " \\pm ")
-    output = output.replace(".", ",")
+    #output = output.replace(".", ",")
     output += "\\hline\n\\end{tabular}"
     return cleanExponents(output)
