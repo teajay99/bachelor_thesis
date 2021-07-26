@@ -9,8 +9,6 @@ template <int dim, class su2Type> class cudaMetropolizer {
 public:
   cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
                    su2Type *fields);
-  // cudaMetropolizer(su2Action<dim> iAction, int iMultiProbe, double iDelta,
-  //                  bool cold, std::string partFile);
   ~cudaMetropolizer();
 
   double sweep(int sweeps);
@@ -31,8 +29,6 @@ private:
   su2Type *fields;
 };
 
-// template class cudaMetropolizer<2>;
-// template class cudaMetropolizer<3>;
 template class cudaMetropolizer<4, su2Element>;
 template class cudaMetropolizer<4, su2TetElement>;
 template class cudaMetropolizer<4, su2OctElement>;
@@ -42,11 +38,5 @@ template class cudaMetropolizer<4, su2VolleyElement>;
 template class cudaMetropolizer<4, su2_5CellElement>;
 template class cudaMetropolizer<4, su2_16CellElement>;
 template class cudaMetropolizer<4, su2_120CellElement>;
-// template class cudaMetropolizer<5>;
-// template class cudaMetropolizer<6>;
-// template class cudaMetropolizer<7>;
-// template class cudaMetropolizer<8>;
-// template class cudaMetropolizer<9>;
-// template class cudaMetropolizer<10>;
 
 #endif

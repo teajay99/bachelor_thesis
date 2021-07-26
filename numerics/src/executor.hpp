@@ -23,7 +23,7 @@ private:
 
   void logResults(int i, double plaquette, double hitRate, std::ofstream &file);
 
-  void initListFields(bool cold);
+  void loadListFields(bool cold);
 
   su2Action<dim> action;
   std::string partFile;

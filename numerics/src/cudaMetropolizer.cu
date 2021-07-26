@@ -5,30 +5,6 @@
 #include <curand_mtgp32_host.h>
 #include <curand_mtgp32dc_p_11213.h>
 
-#define CUDA_CALL(x)                                                           \
-  do {                                                                         \
-    if ((x) != cudaSuccess) {                                                  \
-      printf("Error at %s:%d\n", __FILE__, __LINE__);                          \
-    }                                                                          \
-  } while (0)
-
-#define CURAND_CALL(x)                                                         \
-  do {                                                                         \
-    if ((x) != CURAND_STATUS_SUCCESS) {                                        \
-      printf("Error at %s:%d\n", __FILE__, __LINE__);                          \
-    }                                                                          \
-  } while (0)
-
-void checkCudaErrors(int i) {
-  cudaError_t err = cudaGetLastError(); // add
-  if (err != cudaSuccess) {
-    std::cout << "CUDA error " << i << ": " << cudaGetErrorString(err)
-              << std::endl; // add
-    cudaProfilerStop();
-    exit(1);
-  }
-}
-
 template <int dim, class su2Type>
 __global__ void kernel_probeSite(su2Action<dim> act, su2Type *fields,
                                  CUDA_RAND_STATE_TYPE *randStates,
@@ -136,9 +112,11 @@ cudaMetropolizer<dim, su2Type>::cudaMetropolizer(su2Action<dim> iAction,
                                                  su2Type *iFields)
     : action(iAction) {
   delta = iDelta;
+  multiProbe = iMultiProbe;
+
   blockCount =
       ((action.getSiteCount() / 2) + CUDA_BLOCK_SIZE - 1) / CUDA_BLOCK_SIZE;
-  multiProbe = iMultiProbe;
+
 
   cudaMalloc(&randStates,
              sizeof(CUDA_RAND_STATE_TYPE) * (action.getSiteCount() / 2));
@@ -147,14 +125,11 @@ cudaMetropolizer<dim, su2Type>::cudaMetropolizer(su2Action<dim> iAction,
 
   kernel_initIteration<su2Type><<<blockCount, CUDA_BLOCK_SIZE>>>(
       randStates, hitCounts, action.getSiteCount());
-
-  checkCudaErrors(2);
 }
 
 template <int dim, class su2Type>
 cudaMetropolizer<dim, su2Type>::~cudaMetropolizer() {
   cudaFree(randStates);
-  cudaFree(fields);
   cudaFree(hitCounts);
 }
 
@@ -163,10 +138,8 @@ double cudaMetropolizer<dim, su2Type>::sweep(int sweeps) {
   for (int i = 0; i < sweeps; i++) {
     for (int odd = 0; odd < 2; odd++) {
       for (int mu = 0; mu < dim; mu++) {
-        checkCudaErrors(3);
         kernel_probeSite<dim, su2Type><<<blockCount, CUDA_BLOCK_SIZE>>>(
             action, fields, randStates, hitCounts, multiProbe, delta, odd, mu);
-        checkCudaErrors(1);
       }
     }
   }

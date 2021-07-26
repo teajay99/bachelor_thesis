@@ -1,4 +1,4 @@
-In order to evaluate the effects of the proposed discretizations of \SUTwo the so-called Metropolis Monte Carlo Method was used. The goal of this method is to estimate the expectation value of an Operator $\mathcal{O}$ by numerically evaluating the path integral given by
+In order to evaluate the effects of the proposed discretizations of \SUTwo the so-called Metropolis Monte Carlo Method was used. The goal of this method is to estimate the expectation value of an operator $\mathcal{O}$ by numerically evaluating the path integral given by
 \begin{align*}
  \left\langle \mathcal{O} \right\rangle & = \frac{1}{Z}\int \left( \prod_\mu \mathcal{D} U_\mu \right) \, \mathcal{O} \exp \left( - S_G(U)\right) \\
  \textrm{with} \qquad Z                 & = \int \left( \prod_\mu \mathcal{D} U_\mu \right) \exp \left( - S_G(U)\right)
@@ -59,7 +59,7 @@ After equilibrium is reached, every successive iteration will generate a new ran
 A key element of such simulations takes place in line \ref{code:metroMonteIfCond} with the generation of a new random element. The implementation of this for the continuous as well as the discrete case will be presented in the following sections.
 
 \subsection{The Continous Case}
-The first idea that comes to mind for the continuous case is just to pick a random point on the sphere $S_3$. Procedures to find uniformly distributed random points on spheres of arbitrary dimensions are well known \cite{Tashiro:1977}. One such procedure to get the euclidean coordinates $x_{\textrm{rand}}$ of a random point on $S_n$ would be given by
+The first idea that comes to mind for the continuous case is just to pick a random point on the sphere $S_3$. Procedures to find uniformly distributed random points on spheres of arbitrary dimensions are well known \cite{Tashiro:1977}. One such procedure to get the Euclidean coordinates $x_{\textrm{rand}}$ of a random point on $S_n$ would be given by
 \begin{align}
  x_{\textrm{rand}} = \frac{1}{\sqrt{\sum_{i=1}^{n+1}(x^i_{\textrm{rand}})^2}} \begin{pmatrix}
   x^1_{\textrm{rand}} \\
