@@ -1,34 +1,29 @@
 %!TeX spellcheck = en-DE
 
-\documentclass[a4paper]{scrartcl}
+\documentclass[a4paper,twoside]{scrartcl}
 \usepackage{packages}
-
-
-\title{Bachelor Thesis}
-\author{Timo Jakobs \\\\ \textbf{University of Bonn}}
-\date{\today}
 
 \newcommand{\SUTwo}{$\mathrm{SU}(2)$\xspace}
 
 \tabulinesep=1.2mm
 
 \begin{document}
-\maketitle
+\input{titlepage}
 
 \begin{abstract}
-In this work we will take a look at different approaches to approximating the group \SUTwo in its function as the gauge group of a quantum field theory. This includes finite subgroups of \SUTwo like the popular icosahedral approximation, four-dimensional versions of the platonic solids and geodesic polytopes, as well as a generalized fibonacci lattice. In order to test these approximations Metropolis Monte Carlo simulations were implemented and run.
+ In this thesis we will take a look at different approaches to approximating the group \SUTwo by a finite subset in its function as the gauge group of a quantum field theory. This includes finite subgroups of \SUTwo like the popular icosahedral approximation, four-dimensional versions of the Platonic solids and geodesic polytopes, as well as a generalized Fibonacci lattice. In order to test these approximations, Metropolis Monte Carlo simulations were implemented and run.
 \end{abstract}
 
 \tableofcontents
 \newpage
 
-
-
-
-\section{The lattice action}
+\section{Introduction}
 \import{chap_introduction/}{chapter.tex}
 
-\section{Discretisations of \SUTwo}
+\section{The lattice action}
+\import{chap_lattice_gauge/}{chapter.tex}
+
+\section{Discretization of \SUTwo}
 \label{sec:discSu2}
 \import{chap_discrete_su_2/}{chapter.tex}
 
@@ -45,9 +40,5 @@ In this work we will take a look at different approaches to approximating the gr
 
 \printbibliography
 
-\begin{appendix}
-\section{Recorded Data}
-%\import{appendix_raw_data/}{raw_data.tex}
-\end{appendix}
 
 \end{document}

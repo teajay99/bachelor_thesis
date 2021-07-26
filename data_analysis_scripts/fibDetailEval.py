@@ -12,7 +12,7 @@ WORK_DIR = "tmpData/fibDetailEval"
 
 
 def evalBeta(c, beta, collectData, cold):
-    thermTime = 20000
+    thermTime = 50000
     iterations = 1000
 
     ex = executor.executor(8)
@@ -96,9 +96,45 @@ def main():
                     else:
                         betaIdx += 1
 
-    pltLib.startNewPlot("", "", "")
-    pltLib.plot1DErrPoints(fibCounts, resultsHot, clr="r")
-    pltLib.plot1DErrPoints(fibCounts, resultsCold, clr="k")
+    otherParts = [
+        ufloat(2.15, 0.15),
+        ufloat(3.2, 0.1),
+        ufloat(5.7, 0.2),
+        ufloat(1.15, 0.15),
+        ufloat(1.9, 0.2),
+        ufloat(4.95, 0.05)
+    ]
+    otherCounts = [24, 48, 120, 8, 16, 80]
+    otherPartNames = [
+        "$\\overline{T}$", "$\\overline{O}$", "$\\overline{I}$", "$C_{16}$",
+        "$C_8$", "$V_1$"
+    ]
+
+    def fitFunc(x, a, b):
+        return a * np.sqrt(x) +b
+        #return x**(a) + b
+
+    fibCountsCold = np.array([1.0 *i for i in fibCountsCold], dtype=np.float64)
+
+    popt, perr, crs = pltLib.makeFit1DErr(fibCountsCold, resultsCold, fitFunc)
+
+    print(popt, perr, crs)
+
+    pltLib.startNewPlot("$n$", "$\\beta_{\\textrm{ph.}}$", "")
+    pltLib.setLogScale(True, False)
+    pltLib.plot1DErrFitFunc(fitFunc, popt, 8, 160, label="$\\textrm{fit function}$",clr="b",log=True)
+    pltLib.plot1DErrPoints(fibCountsHot,
+                           resultsHot,
+                           clr="r",
+                           label="$F_n \\textrm{ hot start}$")
+    pltLib.plot1DErrPoints(fibCountsCold,
+                           resultsCold,
+                           clr="b",
+                           label="$F_n \\textrm{ cold start}$")
+    pltLib.plot1DErrPoints(otherCounts, otherParts)
+    for i, txt in enumerate(otherPartNames):
+        pltLib.ax.annotate(txt, (otherCounts[i] * 1.05, otherParts[i].n - 0.1))
+    pltLib.export("export/fibPhaseScan.pgf", width=0.9)
     pltLib.endPlot()
 
 

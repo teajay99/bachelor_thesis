@@ -1,11 +1,11 @@
-In order to evaluate the effects of the proposed discretizations of \SUTwo the so called Metropolis Monte Carlo Method was used. The goal of this method is estimate the expectaion value of an Operator $\mathcal{O}$ by numerically evaluating the path integral given by
+In order to evaluate the effects of the proposed discretizations of \SUTwo the so-called Metropolis Monte Carlo Method was used. The goal of this method is to estimate the expectation value of an Operator $\mathcal{O}$ by numerically evaluating the path integral given by
 \begin{align*}
- \left\langle \mathcal{O} \right\rangle & = \frac{1}{Z}\int \left( \prod_\mu \mathcal{D} U_\mu \right) \, \mathcal{O} \exp \left( - S_G^{(\textrm{eucl.})}(U)\right) \\
- \textrm{with} \qquad Z                 & = \int \left( \prod_\mu \mathcal{D} U_\mu \right) \exp \left( - S_G^{(\textrm{eucl.})}(U)\right)
+ \left\langle \mathcal{O} \right\rangle & = \frac{1}{Z}\int \left( \prod_\mu \mathcal{D} U_\mu \right) \, \mathcal{O} \exp \left( - S_G(U)\right) \\
+ \textrm{with} \qquad Z                 & = \int \left( \prod_\mu \mathcal{D} U_\mu \right) \exp \left( - S_G(U)\right)
 \end{align*}
-This is done by randomly generating lattice configurations $\boldsymbol{U} \equiv \{ U_\mu(n) \}$ with a probability distribution given by
+This is done by randomly generating lattice configurations $\boldsymbol{U} := \{ U_\mu(n) \}$ with a probability distribution given by
 \begin{align}
- \rho ( \boldsymbol{U} ) = \frac{\exp\left(  -S_G^{(\textrm{eucl.})}(\boldsymbol{U}) \right)}{Z} \textrm{.}
+ \rho ( \boldsymbol{U} ) = \frac{\exp\left(  -S_G(\boldsymbol{U}) \right)}{Z} \textrm{.}
  \label{eq:metroDist}
 \end{align}
 For a set of $N$ configurations $\{ \boldsymbol{U}^i \}$ the expectation value of $\mathcal{O}$ is then obtained by a simple arithmetic average
@@ -13,7 +13,7 @@ For a set of $N$ configurations $\{ \boldsymbol{U}^i \}$ the expectation value o
  \left\langle \mathcal{O} \right\rangle & = \frac{1}{N} \sum_{\boldsymbol{U} \in \{ \boldsymbol{U}^i \}} \mathcal{O} (\boldsymbol{U}) \textrm{.}
 \end{align*}
 
-There are numerous ways of generating lattice configurations $\{ \boldsymbol{U}^i \}$. A popular choice is the so called \emph{Metropolis algorithm} first proposed in \cite{metropolis:1953} and applied to quantum simulations in \cite{Creutz:1981}. A simple implementation can be found in algorithm \ref{alg:metroMonte}.
+There are numerous ways of generating lattice configurations $\{ \boldsymbol{U}^i \}$. A popular choice is the so-called \emph{Metropolis algorithm}, first proposed in \cite{metropolis:1953} and applied to quantum simulations in \cite{Creutz:1981}. A simple implementation can be found in algorithm \ref{alg:metroMonte}.
 
 \begin{algorithm}[!htb]
  \caption{Metropolis Monte Carlo}
@@ -52,14 +52,14 @@ There are numerous ways of generating lattice configurations $\{ \boldsymbol{U}^
   \ENDFOR
  \end{algorithmic}
 \end{algorithm}
-As an initial configuration one usually either chooses a cold starting configuration, i.e. {$U_\mu(n)=1$} or a hot one where every link variable is set to a random element of \SUTwo. After that it takes numerous Iterations until the configuration reaches \emph{thermal equilibrium}. A common way to figure out how many iterations this takes, is to run the simulation once with a hot and once with a cold start, and see where the measured values start to agree.
+As an initial configuration, one usually either chooses a cold starting configuration, i.e. {$U_\mu(n)=1$} or a hot one where every link variable is set to a random element of \SUTwo. After that it takes numerous iterations until the configuration reaches \emph{thermal equilibrium}. A common way to figure out how many iterations this takes, is to run the simulation once with a hot and once with a cold start, and see where the measured values start to agree.
 
-After equilibrium is reached every succesive iteration will generate a new random lattice configuration distributed according to eq. \ref{eq:metroDist}. Therefore $\left\langle \mathcal{O} \right\rangle$ can then be measured to arbitrary precision by simply generating a sufficient amount of lattice configurations. The only limit to this would be the finite precision of flotaing point operations on digital computers, as well as the limited randomness of pseudo random number generators.
+After equilibrium is reached, every successive iteration will generate a new random lattice configuration distributed according to eq. \ref{eq:metroDist}. Therefore, $\left\langle \mathcal{O} \right\rangle$ can then be measured to arbitrary precision by simply generating a sufficient amount of lattice configurations. The only limit to this would be the finite precision of floating-point operations on digital computers, as well as the limited randomness of pseudo random number generators.
 
-A key element of such simulations takes place in line \ref{code:metroMonteIfCond} with the generation of a new random element. The implementation of this for the continuous as well as the discrete case will be presented in the following sections
+A key element of such simulations takes place in line \ref{code:metroMonteIfCond} with the generation of a new random element. The implementation of this for the continuous as well as the discrete case will be presented in the following sections.
 
 \subsection{The Continous Case}
-The first idea that comes to mind for the continuous case is just to pick a random point on the sphere. Procedures to find uniformly distributed random points on spheres of arbitrary dimensions are well known \cite{findsource}. One such procedure to get the euclidian coordinates $x_{\textrm{rand}}$ of a random point on $S_n$ would be given by
+The first idea that comes to mind for the continuous case is just to pick a random point on the sphere $S_3$. Procedures to find uniformly distributed random points on spheres of arbitrary dimensions are well known \cite{Tashiro:1977}. One such procedure to get the euclidean coordinates $x_{\textrm{rand}}$ of a random point on $S_n$ would be given by
 \begin{align}
  x_{\textrm{rand}} = \frac{1}{\sqrt{\sum_{i=1}^{n+1}(x^i_{\textrm{rand}})^2}} \begin{pmatrix}
   x^1_{\textrm{rand}} \\
@@ -69,7 +69,7 @@ The first idea that comes to mind for the continuous case is just to pick a rand
  \end{pmatrix}
  \label{eq:randSpherePoint}
 \end{align}
-where $\{x^i_{\textrm{rand}}\}$ are random numbers generated by a normal distribution with expectaion value $\mu = 0$ and an arbitrary standard deviation $\sigma \neq 0$.
+where $\{x^i_{\textrm{rand}}\}$ are random numbers generated by a normal distribution with expectation value $\mu = 0$ and an arbitrary standard deviation $\sigma \neq 0$.
 
 The problem with this approach is that for high values of $\beta$ line \ref{code:metroMonteIfCond} in the algorithm will quite often evaluate to \texttt{false}, as $\Delta S$ is likely to be big. This leads to little change in the configuration per iteration, and therefore high run times to generate sufficient statistics.
 
@@ -77,17 +77,16 @@ This is why one usually aims to generate an element $U_\mu^{\textrm{new}}(n)$ wh
 \begin{align*}
  U_\mu^{\textrm{new}}(n) = V \, U_\mu^{\textrm{old}} (n)
 \end{align*}
-where $V$ is a random group element within the angular distance $2  \pi \delta$ of $1$. $V$ can be found as
+where $V$ is a random group element within the angular distance $\pi \delta$ of $1$. $V$ can be found as
 \begin{align}
- V = \cos (2 \pi d ) + \sin (2 \pi d) \left(i x_1  + j x_2  + k x_3\right)
+ V = \cos (\pi d ) + \sin (\pi d) \left(i x_1  + j x_2  + k x_3\right)
  \label{eq:transitionV}
 \end{align}
-where $d$ is a random number uniformly distributed within the interval $[0,\delta]$ and $(x_1,x_2,x_3)$ are a random point on $S_2$ found by applying eq. \ref{eq:randSpherePoint}.
+where $d$ is a random number uniformly distributed within the interval $[-\delta,\delta]$ and $(x_1,x_2,x_3)$ are a random point on $S_2$ found by applying eq. \ref{eq:randSpherePoint}.
 
-%The parameter $\delta$ therefore controls how close $V$ to $1$ is, and thus also how close $U^{\textrm{new}}$ to $U^{\textrm{old}}$ is. Generally one a
 \subsection{Finite Gauge Sets}
 
-Furthermore we need to deal with finite gauge sets $G$. As proposed in \ref{Petcher:1980} one can employ a similar procedure to the continuous case for the finite subgroups of \SUTwo by simply setting $V$ to a random element of the group adjacent to $1$. These would be given by the elements $N(G)$ that minimize the value of $\norm{V - 1}$ and can explicitly found in table \ref{tab:adjacentGenerators}.
+Furthermore, we need to deal with finite gauge sets $G$. As proposed in \cite{Petcher:1980} one can employ a similar procedure to the continuous case for the finite subgroups of \SUTwo by simply setting $V$ to a random element of the group adjacent to $1$. These would be given by the elements $N(G)$ that minimize the value of $\norm{V - 1}$ and can be found explicitly in table \ref{tab:adjacentGenerators}.
 \begin{table}
  \centering
  \begin{tabu}{c|l}
@@ -106,13 +105,13 @@ Furthermore we need to deal with finite gauge sets $G$. As proposed in \ref{Petc
 \end{table}
 Multiplying them from the left amounts to a small rotation, mapping all vertices to one of their adjacent vertices.\\
 
-All other lattices do not posses group properties, so the transition to a neighbouring vertex needs to be implemented in another way. In the case of $C_5$ all five vertices are adjacent to one another, so one can simply pick $U^{\textrm{new}}_\mu$ from one of the four vertices that is not $U^{\textrm{old}}_\mu$.\\
+All other lattices do not possess group properties, so the transition to a neighboring vertex needs to be implemented in another way. In the case of $C_5$ all five vertices are adjacent to one another, so one can simply pick $U^{\textrm{new}}_\mu$ from one of the four vertices that is not $U^{\textrm{old}}_\mu$.\\
 
 Finding the four adjacent vertices of a given vertex of $C_{120}$ is a less trivial task. As quaternionic multiplication from the left can be interpreted as a rotation in $\mathbb{R}^4$ the construction of $C_{120}$ found in table \ref{tab:polytopes} suggest that the vertices of $C_{120}$ are given by the vertices of $\overline{I}$ as well as four rotated copies of it. In order to keep track of where we are on $C_{120}$ we can therefore just keep track of where we are on $\overline{I}$ (for which we can make use of the group properties) and whether one of the four rotations needs to be applied.
 
 Unfortunately we can not use the five elements of $C_5$ as these rotations, as they implement rotations by about $\cos^{-1}\left({\frac{1}{4}}\right) \approx \SI{75}{^\circ}$ and therefore will most certainly not map a vertex of $\overline{I}$ to an adjacent one of $C_{120}$.
 
-In order to obtain a useful set of rotation matrices we take a look at the vertices $1,i,j$ and $k$ of $\overline{I}$. As these translate to the basis vectors of $\mathbb{R}^4$ the columns of the rotation matrices must be given by the neighbours of these vertices. To figure out which of the $(4!)^3 = 13824$ combinations of these columns leads to the right matrices a brute force symbolic calculation was used. This indeed gave a unique solution given by
+In order to obtain a useful set of rotation matrices, we take a look at the vertices $1,i,j$ and $k$ of $\overline{I}$. As these translate to the basis vectors of $\mathbb{R}^4$ the columns of the rotation matrices must be given by the neighbors of these vertices. To figure out which of the $(4!)^3 = 13824$ combinations of these columns leads to the right matrices, a brute force symbolic calculation was used. This indeed gave a unique solution given by
 \begin{align*}
   & R = \left\{
  \begin{bmatrix}
@@ -178,14 +177,11 @@ To implement this we introduced a rotation index $r \in \{0,1,2,3,4\}$ which ind
  \end{algorithmic}
 \end{algorithm}
 
-Next up is $V_n$. For this we simply keep track of the corresponding vertex of $\tilde{V}_n$, as addition or subtraction of $\frac{1}{n+1}$ to any component of a given vertex, will lead to an adjacent vertex. The only restriction to this would be, that all components need to be within the interval $\left[-\frac{1}{2},\frac{1}{2}\right]$, as well as that at least one component needs to equal $\pm \frac{1}{2}$. For $n = 0$ this also covers $C_8$.\\
+Next up is $V_n$. For this we simply keep track of the corresponding vertex of $\tilde{V}_n$, as here addition or subtraction of $\frac{1}{n+1}$ to any component of a given vertex, will lead to an adjacent vertex. The only restriction to this would be, that all components need to be within the interval $\left[-\frac{1}{2},\frac{1}{2}\right]$, as well as that at least one component needs to equal $\pm \frac{1}{2}$. For $n = 0$ this also covers $C_8$.\\
 
-Lastly we are left with the fibonacci lattice. As maybe best seen in \ref{fig:fibonacciPic} the notion of an adjacent vertex is quite hard to define for the fibonacci lattice, as the amount of adjacent vertices, as well as their exact distances vary for each vertex. Therefore here we went with the less elegant approach of picking a random element from the whole lattice.
-
+Lastly, we are left with the Fibonacci lattice. As maybe best seen in figure \ref{fig:fibonacciPic} the notion of an adjacent vertex is quite hard to define for the Fibonacci lattice, as the amount of adjacent vertices, as well as their exact distances vary for each vertex. Therefore, here we went with the less elegant approach of simply picking a random element from the whole lattice.
 
 % \begin{itemize}
 %   \item Vielleicht nützlich \url{https://link.springer.com/content/pdf/10.1007/BF01548769.pdf}
 % \end{itemize}
-
-
 %  https://journals.aps.org/prd/pdf/10.1103/PhysRevD.22.2465

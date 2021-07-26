@@ -120,7 +120,7 @@ def makeFit1DErr(xin, yin, func, p0=None):
     popt, pcov = curve_fit(func, x, y, sigma=yerr, p0=p0)
 
     #Calculate CRS
-    CR, CRS = chisquare(y, func(x, *popt), ddof=len(popt))
+    CRS = getCRS(y, func(x, *popt), yerr, len(popt))
 
     perr = np.sqrt(np.diag(pcov))
 
@@ -180,9 +180,9 @@ def setSymLogScale(x, y, xthresh=1, ythresh=1):
         yaxis.set_minor_locator(MinorSymLogLocator(ythresh))
 
 
-def export(fname, legndLoc='best', legend=True, width=None, height=1.0):
+def export(fname, legendLoc='best', legend=True, width=None, height=1.0):
     if legend:
-        plt.legend(loc=legndLoc, fontsize=10, frameon=True)
+        plt.legend(loc=legendLoc, fontsize=10, frameon=True)
     if width != None:
         fig.set_size_inches(width * 6.49733,
                             height * width * 6.49733 * (5.0**.5 - 1.0) / 2.0)
@@ -260,7 +260,7 @@ def plot1DErrPoints(x, y, label="", clr='k'):
         label=label)
 
 
-def plotPoints(x, y, label="", clr='k', marker="+",s=20):
+def plotPoints(x, y, label="", clr='k', marker="+", s=20):
     ax.scatter(x, y, label=label, color=clr, marker=marker, s=s)
 
 
@@ -299,6 +299,29 @@ def plotFitFunc(func,
             label=label,
             zorder=2,
             linestyle=linestyle)
+
+
+def plot1DErrFitFunc(func,
+                     p,
+                     xMin=-1,
+                     xMax=1,
+                     resolution=500,
+                     label="",
+                     clr="r",
+                     linestyle="-",
+                     log=False):
+    def newFunc(par, x):
+        return func(x, *par)
+
+    return plotFitFunc(newFunc,
+                       p,
+                       xMin=xMin,
+                       xMax=xMax,
+                       resolution=resolution,
+                       label=label,
+                       clr=clr,
+                       linestyle=linestyle,
+                       log=log)
 
 
 def plotFunc(func,

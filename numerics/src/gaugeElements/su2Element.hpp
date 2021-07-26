@@ -52,7 +52,8 @@ public:
   su2Element randomize(double delta, std::mt19937 &gen) {
 
     std::normal_distribution<double> normal_dist(0., 1.);
-    std::uniform_real_distribution<double> uni_dist(0, M_PI * delta * 2);
+    std::uniform_real_distribution<double> uni_dist(-M_PI * delta,
+                                                    M_PI * delta);
 
     double alpha = uni_dist(gen);
 
@@ -64,14 +65,14 @@ public:
   };
 
   __device__ su2Element randomize(double delta, CUDA_RAND_STATE_TYPE *state) {
-    double alpha = curand_uniform_double(state) * (M_PI * delta * 2.);
+    double alpha =
+        (curand_uniform_double(state) * (M_PI * delta * 2.)) - (M_PI * delta);
     double pnt[3];
     for (int i = 0; i < 3; i++) {
       pnt[i] = curand_normal_double(state);
     }
     return this->randomize(alpha, &pnt[0]);
   };
-
 
   __device__ __host__ void renormalize() {
     double norm = 0;
@@ -104,7 +105,6 @@ protected:
 
     return su2Element(&coord[0]) * (*this);
   };
-
 
   double element[4];
 };

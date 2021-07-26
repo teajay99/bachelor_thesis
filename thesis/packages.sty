@@ -26,6 +26,9 @@
 \usepackage{tabu}
 \usepackage{placeins}
 \usepackage{xspace}
+\usepackage{tabularx}
+
+%\addtokomafont{disposition}{\rmfamily}
 
 \usepackage{algorithm,algcompatible}
 \renewcommand{\COMMENT}[2][.5\linewidth]{%
@@ -36,15 +39,12 @@
 \usetikzlibrary{arrows}
 \usetikzlibrary{decorations.markings}
 
+
 \usepackage[
  backend=biber,
  natbib=true,
- %style=authoryear-icomp,
- %sortlocale=de_DE,
- %url=false,
- doi=true,
- eprint=false,
- ibidtracker=false
+ style=numeric,
+ sorting=none
 ]{biblatex}
 \addbibresource{refs.bib}
 \usepackage{cancel}
@@ -79,6 +79,5 @@
 }
 
 \newcolumntype{L}{>{$}c<{$}}
-\geometry{a4paper, top=30mm, left=30mm, right=20mm, bottom=20mm,
- headsep=15mm, footskip=20mm}
+ \geometry{a4paper, top=35mm, left=30mm, right=20mm, bottom=25mm}
 \usepackage{import}

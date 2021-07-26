@@ -1,0 +1,10 @@
+
+Gauge theories are an essential building block of the standard model of particle physics, and therefore our understanding of modern physics. One of the early examples is quantum electrodynamics, which can be solved perturbatively and matched experiments to an enormous precision. With the introduction of further gauge theories, such as quantum chromodynamics, these perturbative approaches however quickly found their limits, especially when met with bigger coupling constants.
+
+This was solved by putting these theories onto a space-time lattice and conducting Monte Carlo simulations of these systems. These however have their own limitations, which is why one now aims to simulate such theories on quantum computers.
+
+For gauge theories this inevitably requires a parameterization of the gauge group $G$. As one of the biggest limitations of today's quantum hardware is the limited amount of quantum memory, this needs to be done efficiently.\\
+
+This is why in the following work we take a look at different discretizations for one of the simplest non-trivial examples for such a gauge group, given by \SUTwo. On classical computers, the group elements are typically stored as four single or double precision numbers, taking up $4 \cdot 32 = 128$ and $4 \cdot 64 = 256$ bits of memory. In this way one can parameterize a vast amount of different group elements, such that for most practical intents and purposes this can be treated as an exact representation.
+
+The most advanced quantum computers of today however have still significantly less than $100$ qbits, rendering floating-point representations impractical and wasteful. Instead, we will discuss in the following, how one could pick a small \emph{representative} subset of \SUTwo, and simulate the effects these approximations have on a lattice gauge theory.

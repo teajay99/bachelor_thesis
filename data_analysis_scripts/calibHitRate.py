@@ -88,6 +88,10 @@ def fitDeltas():
 
     print(p, perr, crs)
 
+    with open('tmpData/delta_fit_params.csv', 'w') as f:
+        for item in p:
+            f.write("%s\n" % item)
+
     pltLib.startNewPlot("$\\beta$", "", "")
     pltLib.setLogScale(True, False)
     pltLib.plotPoints(betas, deltas, clr="k", label="$\\delta$", marker="x")
@@ -95,18 +99,25 @@ def fitDeltas():
                       hitRates + 0.5,
                       clr="b",
                       label="$\\frac{N_{\\textrm{acc}}}{N_{\\textrm{hit}}}$")
-    pltLib.plotFitFunc(fitFunc, p, np.min(betas), np.max(betas), log=True,label="$\\textrm{Fit}$")
-    pltLib.export("export/calibHitRate.pgf",width=0.54)
+    pltLib.plotFitFunc(fitFunc,
+                       p,
+                       np.min(betas),
+                       np.max(betas),
+                       log=True,
+                       label="$\\textrm{Fit}$")
+    pltLib.export("export/calibHitRate.pgf",
+                  width=0.54,
+                  legendLoc="lower left")
     pltLib.endPlot()
 
 
 def main():
-    sweeps = 30
-    latSize = 4
-    thermTime = 300
+    sweeps = 50
+    latSize = 6
+    thermTime = 500
     iterations = 30
 
-    betas = helpers.getRoundedLogSpace(0.01, 100, 20)
+    betas = helpers.getRoundedLogSpace(0.1, 100, 25)
 
     #calibrateDeltas(latSize, betas, thermTime, sweeps, iterations)
     fitDeltas()
