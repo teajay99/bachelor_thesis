@@ -4,7 +4,7 @@ Finally, it is time to code up the simulations. This was done in \texttt{C++} ma
 
 First up, we need to figure out how to choose the $\delta$ parameter when generating the transition elements $V$ in eq. \ref{eq:transitionV}. This is a bit of a balancing act, as for bigger values of $\delta$ fewer configuration changes will be accepted, leading to successive configurations being very similar. With small $\delta$, more of the configuration changes will be accepted, but now these changes are very small and the successive configuration will still look a lot like the previous one.
 
-The good news is however that the choice of $\delta$ is not critical, as for a sufficient amount of iterations, it will not affect the measured quantities themselves. Correlation between successive configurations however need to be taken into account when estimating the uncertainties of a measured quantity. This was done using the \texttt{uwerrprimary} function from the \emph{R} library \texttt{hadron}.\\
+The good news is, however, that the choice of $\delta$ is not critical, as for a sufficient amount of iterations, it will not affect the measured quantities themselves. Correlation between successive configurations however need to be taken into account when estimating the uncertainties of a measured quantity. This was done using the \texttt{uwerrprimary} function from the \emph{R} library \texttt{hadron}.\\
 
 To evaluate how well $\delta$ is chosen, one can take a look at the acceptance rate $\frac{N_{\textrm{acc}}}{N_{\textrm{hit}}}$, i.e. the ratio of line \ref{code:metroMonteIfCond} in algorithm \ref{alg:metroMonte} evaluating to \texttt{true} and the total number of evaluations. A good rule of thumb is to get the acceptance rate to about $\SI{50}{\%}$.
 \begin{figure}[!hbt]
@@ -16,7 +16,7 @@ To evaluate how well $\delta$ is chosen, one can take a look at the acceptance r
  \end{subfigure}
  \begin{subfigure}[t]{0.49\textwidth}
   \input{referenceDataSet.pgf}
-  \caption{$P(\beta)$ measured on an $8^4$ lattice for $100,000$ iterations. All error bars are significantly smaller than the plotted points and where therefore omitted.}
+  \caption{$P(\beta)$ measured on an $8^4$ lattice for $100,000$ iterations. All error bars are significantly smaller than the plotted points and were therefore omitted.}
   \label{plot:refDataSet}
  \end{subfigure}
  \caption{}
@@ -75,7 +75,7 @@ The same article also gives a weak coupling expansion in $\frac{1}{\beta}$ up to
 \begin{align*}
  P(\beta)_{\textrm{w. c.}} & = \sum_{i=1}^{15} \frac{\gamma_i}{(\beta)^i} \textrm{,}
 \end{align*}
-where the coefficients $\gamma_i$ can be found in table \ref{tab:weakCoupleCoff}. For this another data set with $10,000$ iterations was generated to account for the smaller lattice size. The results can be found in figure \ref{plot:weakCoupling}. The values agree within the error bars up to about $1/\beta = 0.25$, and then start to slowly deviate. Nevertheless, they confirm that the simulation is working correctly.\\
+where the coefficients $\gamma_i$ can be found in table \ref{tab:weakCoupleCoff}. For this, another data set with $10,000$ iterations was generated to account for the smaller lattice size. The results can be found in figure \ref{plot:weakCoupling}. The values agree within the error bars up to about $1/\beta = 0.25$, and then start to slowly deviate. Nevertheless, they confirm that the simulation is working correctly.\\
 \begin{table}[!hbt]
  \centering
  \begin{tabular}{L || L | L | L | L | L | L | L | L}
@@ -109,7 +109,7 @@ We begin with the finite subgroups $\overline{T}$, $\overline{O}$ and $\overline
 
 The continuous case does not show this behavior, as for any $\beta$ configuration changes with a sufficiently small $\Delta S$ exist. This therefore always allows for some small fluctuations, decreasing the measured value of $P$. Thus, all the proposed approximations will only be useful for values where $\beta < \beta_{\textrm{ph.}}$.
 
-Another interesting feature of figure \ref{plot:subgroups} is, that the cold and hot starting configurations form a hysteresis loop around the phase transition. This indicates, that around $\beta_{\textrm{ph.}}$ multiple semi stable configurations exist. It can be expected that this can be partially fixed, by applying more thermalization iterations. Further, testing on $\overline{I}$ however showed, that these loops do not entirely disappear, even for significantly higher numbers of iterations.
+Another interesting feature of figure \ref{plot:subgroups} is that the cold and hot starting configurations form a hysteresis loop around the phase transition. This indicates, that around $\beta_{\textrm{ph.}}$ multiple semi stable configurations exist. It can be expected that this can be partially fixed, by applying more thermalization iterations. Further, testing on $\overline{I}$ however showed, that these loops do not entirely disappear, even for significantly higher numbers of iterations.
 
 In \cite{Petcher:1980} the exact positions of the phase transitions were found to be $\beta_{\textrm{ph.}}(\overline{T}) = 2.15 \pm 0.05$, $\beta_{\textrm{ph.}}(\overline{O}) = 3.25 \pm 0.01$ and $\beta_{\textrm{ph.}}(\overline{I}) = 6.01 \pm 0.01$.
 Estimating these transitions, by taking the center of the corresponding hysteresis loop as $\beta_{\textrm{ph.}}$ and the width of the loop as two standard deviations we can read of $\beta_{\textrm{ph.}}(\overline{T}) = 2.15 \pm 0.15$, $\beta_{\textrm{ph.}}(\overline{O}) = 3.2 \pm 0.1$ and $\beta_{\textrm{ph.}}(\overline{I}) = 5.7 \pm 0.2$. Thus, the values for $\overline{T}$ and $\overline{O}$ agree with \cite{Petcher:1980}, while $\beta_{\textrm{ph.}}(\overline{I})$ was measured slightly lower. The reason for this difference is most likely the limited computing power of the time.\\
@@ -147,7 +147,7 @@ Of the volleyball lattices, only $V_1$ showed a phase transition at $\beta_{\tex
 
 Lastly, we take a look at the Fibonacci lattices. These were tested for lattice sizes  $8$, $16$, $32$, $64$, $128$, $256$ and $512$. The results can be found in figures \ref{plot:fibonacciI} and \ref{plot:fibonacciII}. Reading of the positions of the phase transitions in the same way as before is not really possible here, as for lattice sizes bigger than $16$ the hot configurations didn't really freeze. This is most likely due to the inefficient generation of new random elements. Nevertheless, we can put a lower bound on $\beta_{\textrm{ph.}}$ by taking a look at where the cold starting configuration transitions. With this we get $\beta_{\textrm{ph.}}(F_8) = 1.55 \pm 0.25$, $\beta_{\textrm{ph.}}(F_16) = 2.55 \pm 0.35 $, $\beta_{\textrm{ph.}}(F_{32}) > 3.5 $, $\beta_{\textrm{ph.}}(F_{64}) > 5.2 $ and $\beta_{\textrm{ph.}}(F_{128}) > 7.8$. $F_{256}$ and $F_{512}$ reproduced the reference data set for the whole tested range of $\beta$, with only slight systematic deviations for $F_{256}$ towards higher $\beta$. This is probably indicating an approaching phase transition beyond the measured range.
 
-Surprisingly the Fibonacci lattices seem to perform significantly better than e.g. the subgroups in terms of phase transitions. $F_{32}$ shows systematic deviations at around $\beta = 2$, similar to $\overline{O}$. The actual phase transition of $F_{32}$ however happens for a slightly higher value of $\beta$, although it only has two thirds of the vertices. In the same way, $\overline{I}$ is significantly outperformed by $F_{128}$ with only eight vertices more. \\
+Surprisingly the Fibonacci lattices seem to perform significantly better than e.g. the subgroups in terms of phase transitions. $F_{32}$ shows systematic deviations at around $\beta = 2$, similar to $\overline{O}$. The actual phase transition of $F_{32}$, however, happens for a slightly higher value of $\beta$, although it only has two thirds of the vertices. In the same way, $\overline{I}$ is significantly outperformed by $F_{128}$ with only eight vertices more. \\
 
 \begin{figure}[!hbt]
  \centering
@@ -195,6 +195,6 @@ This can be explained as follows. For very small values of $\beta$, the acceptan
 \begin{align*}
  \sum_{v \in \{\textrm{vertices}\}} v = 0
 \end{align*}
-holds for them. This however is not the case for the Fibonacci lattice, which is why for small $\beta$, such a lack of \emph{balance} shows up as a systematic deviation. With increasing the size of the Fibonacci lattices, these effects however decrease.
+holds for them. This however is not the case for the Fibonacci lattice, which is why for small $\beta$, such a lack of \emph{balance} shows up as a systematic deviation. With increasing the size of the Fibonacci lattices, these effects, however, decrease.
 
 \FloatBarrier

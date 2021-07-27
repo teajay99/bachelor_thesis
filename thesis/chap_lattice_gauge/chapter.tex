@@ -6,7 +6,7 @@ where the matrices $F_{\mu \nu}$ are given by
 \begin{align*}
  F_{\mu \nu} & =  \partial_\mu A_\nu - \partial_\nu A_\mu  -  i g [A_\mu, A_\nu] \textrm{.}
 \end{align*}
-with gauge field $A_\mu = A_\mu^a t_a$ in terms of the generators $t_a$ of $G$ as well as the coupling constant $g$ \cite{Peskin:1995}. In order to treat such a theory numerically one first transitions to imaginary time. This is done by the transition $x^0 \rightarrow -i x_4$ which leads to $S_G \rightarrow i S_G^{(\textrm{eucl.})}$ with
+with gauge field $A_\mu = A_\mu^a t_a$ in terms of the generators $t_a$ of $G$ as well as the coupling constant $g$ \cite{Peskin:1995}. In order to treat such a theory numerically, one first transitions to imaginary time. This is done by the transition $x^0 \rightarrow -i x_4$ which leads to $S_G \rightarrow i S_G^{(\textrm{eucl.})}$ with
 \begin{align*}
  S_G^{(\textrm{eucl.})} & = \frac{1}{4} \int \mathrm{d}^4 x  \sum_{\mu,\nu}  \, \mathrm{Tr} \left[ F_{\mu \nu} (x) F_{\mu \nu} (x) \right] \textrm{.}
 \end{align*}
@@ -36,7 +36,7 @@ and thus
 \begin{align*}
  U_{\mu \nu}^\dagger(n) & = \exp \left( - iga^2 F_{\mu \nu} (n) \right) + \mathcal{O}(a^5) = \mathbb{1} - i g a^2 F_{\mu \nu} (n) - \frac{g^2 a^4}{2} (F_{\mu \nu} (n) )^2 + \mathcal{O}(a^5) \textrm{.}
 \end{align*}
-Such simplifications are reasonable, as the physical continuum limit is obtained by taking the lattice spacing $a \rightarrow 0$. Terms up to order four in $a$ need to be considered, as they are required to transition from the sum over $n$ to the original integral again. Higher order terms however will just vanish when taking the continuum limit and can therefore be dropped.
+Such simplifications are reasonable, as the physical continuum limit is obtained by taking the lattice spacing $a \rightarrow 0$. Terms up to order four in $a$ need to be considered, as they are required to transition from the sum over $n$ to the original integral again. Higher order terms, however, will just vanish when taking the continuum limit and can therefore be dropped.
 
 With this we can now express $F_{\mu \nu}$ in terms of $U_{\mu \nu}$:
 \begin{align*}
