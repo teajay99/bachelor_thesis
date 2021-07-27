@@ -3,6 +3,8 @@
 import numpy as np
 from uncertainties import ufloat
 
+from pathlib import Path
+
 import executor
 import pltLib
 import helpers
@@ -11,6 +13,8 @@ WORK_DIR = "tmpData/calibWeakCoupling"
 
 
 def main():
+    Path(WORK_DIR).mkdir(parents=True, exist_ok=True)
+
     ex = executor.executor(8)
 
     latSize = 6

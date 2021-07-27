@@ -4,6 +4,7 @@ import executor
 import pltLib
 import numpy as np
 import helpers
+from pathlib import Path
 
 from uncertainties import ufloat
 
@@ -112,6 +113,9 @@ def fitDeltas():
 
 
 def main():
+
+    Path(WORK_DIR).mkdir(parents=True, exist_ok=True)
+
     sweeps = 50
     latSize = 6
     thermTime = 500
@@ -119,7 +123,7 @@ def main():
 
     betas = helpers.getRoundedLogSpace(0.1, 100, 25)
 
-    #calibrateDeltas(latSize, betas, thermTime, sweeps, iterations)
+    calibrateDeltas(latSize, betas, thermTime, sweeps, iterations)
     fitDeltas()
 
 

@@ -7,6 +7,8 @@ import pltLib
 import os, shutil, subprocess, pathlib
 from partitions import fibonacci
 from uncertainties import ufloat
+from pathlib import Path
+
 
 WORK_DIR = "tmpData/fibDetailEval"
 
@@ -39,6 +41,8 @@ def evalBeta(c, beta, collectData, cold):
 
 
 def main():
+    Path(WORK_DIR).mkdir(parents=True, exist_ok=True)
+    
     fibCounts = np.array(
         [int(i) for i in helpers.getRoundedLogSpace(8, 256, 41, 4)])[1:]
 

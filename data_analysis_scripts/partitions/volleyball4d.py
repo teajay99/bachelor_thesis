@@ -78,7 +78,7 @@ def generateLattice(subdivs, outFile):
 def main():
     N = 1
     for N in range(10):
-        #generateLattice(N, "../../numerics/testPart.csv")
+        generateLattice(N, "../../numerics/testPart.csv")
         vCount = 16 + (8 * (N**3)) + (24 * (N**2)) + (32 * N)
         print(N,":",vCount)
 
