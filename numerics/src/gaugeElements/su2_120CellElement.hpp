@@ -11,32 +11,57 @@
 #define C120_ICO_TAU_HALF 0.8090169943749474241022934
 #define C120_ICO_TAU_PRIME_HALF 0.3090169943749474241022934
 
+// #define C120_ROT_MATRICES                                                      \
+//   {                                                                            \
+//     {{C120_RHO, -C120_THETA, -C120_THETA, -C120_THETA},                        \
+//      {C120_THETA, C120_RHO, C120_THETA, -C120_THETA},                          \
+//      {C120_THETA, -C120_THETA, C120_RHO, C120_THETA},                          \
+//      {C120_THETA, C120_THETA, -C120_THETA, C120_RHO}},                         \
+//                                                                                \
+//         {{C120_RHO, C120_THETA, -C120_THETA, C120_THETA},                      \
+//          {-C120_THETA, C120_RHO, -C120_THETA, -C120_THETA},                    \
+//          {C120_THETA, C120_THETA, C120_RHO, -C120_THETA},                      \
+//          {-C120_THETA, C120_THETA, C120_THETA, C120_RHO}},                     \
+//                                                                                \
+//         {{C120_RHO, -C120_THETA, C120_THETA, C120_THETA},                      \
+//          {C120_THETA, C120_RHO, -C120_THETA, C120_THETA},                      \
+//          {-C120_THETA, C120_THETA, C120_RHO, C120_THETA},                      \
+//          {-C120_THETA, -C120_THETA, -C120_THETA, C120_RHO}},                   \
+//                                                                                \
+//     {                                                                          \
+//       {C120_RHO, C120_THETA, C120_THETA, -C120_THETA},                         \
+//           {-C120_THETA, C120_RHO, C120_THETA, C120_THETA},                     \
+//           {-C120_THETA, -C120_THETA, C120_RHO, -C120_THETA}, {                 \
+//         C120_THETA, -C120_THETA, C120_THETA, C120_RHO                          \
+//       }                                                                        \
+//     }                                                                          \
+//   }
+
 #define C120_ROT_MATRICES                                                      \
   {                                                                            \
-    {{C120_RHO, -C120_THETA, -C120_THETA, -C120_THETA},                        \
-     {C120_THETA, C120_RHO, C120_THETA, -C120_THETA},                          \
-     {C120_THETA, -C120_THETA, C120_RHO, C120_THETA},                          \
-     {C120_THETA, C120_THETA, -C120_THETA, C120_RHO}},                         \
+    {{C120_RHO, C120_THETA, C120_THETA, C120_THETA},                           \
+     {-C120_THETA, C120_RHO, C120_THETA, -C120_THETA},                         \
+     {-C120_THETA, -C120_THETA, C120_RHO, C120_THETA},                         \
+     {-C120_THETA, C120_THETA, -C120_THETA, C120_RHO}},                        \
                                                                                \
-        {{C120_RHO, C120_THETA, -C120_THETA, C120_THETA},                      \
-         {-C120_THETA, C120_RHO, -C120_THETA, -C120_THETA},                    \
-         {C120_THETA, C120_THETA, C120_RHO, -C120_THETA},                      \
-         {-C120_THETA, C120_THETA, C120_THETA, C120_RHO}},                     \
+        {{C120_RHO, -C120_THETA, -C120_THETA, C120_THETA},                     \
+         {C120_THETA, C120_RHO, C120_THETA, C120_THETA},                       \
+         {C120_THETA, -C120_THETA, C120_RHO, -C120_THETA},                     \
+         {-C120_THETA, -C120_THETA, C120_THETA, C120_RHO}},                    \
                                                                                \
-        {{C120_RHO, -C120_THETA, C120_THETA, C120_THETA},                      \
-         {C120_THETA, C120_RHO, -C120_THETA, C120_THETA},                      \
-         {-C120_THETA, C120_THETA, C120_RHO, C120_THETA},                      \
-         {-C120_THETA, -C120_THETA, -C120_THETA, C120_RHO}},                   \
+        {{C120_RHO, -C120_THETA, C120_THETA, -C120_THETA},                     \
+         {C120_THETA, C120_RHO, -C120_THETA, -C120_THETA},                     \
+         {-C120_THETA, C120_THETA, C120_RHO, -C120_THETA},                     \
+         {C120_THETA, C120_THETA, C120_THETA, C120_RHO}},                      \
                                                                                \
     {                                                                          \
-      {C120_RHO, C120_THETA, C120_THETA, -C120_THETA},                         \
-          {-C120_THETA, C120_RHO, C120_THETA, C120_THETA},                     \
-          {-C120_THETA, -C120_THETA, C120_RHO, -C120_THETA}, {                 \
-        C120_THETA, -C120_THETA, C120_THETA, C120_RHO                          \
+      {C120_RHO, C120_THETA, -C120_THETA, -C120_THETA},                        \
+          {-C120_THETA, C120_RHO, -C120_THETA, C120_THETA},                    \
+          {C120_THETA, C120_THETA, C120_RHO, C120_THETA}, {                    \
+        C120_THETA, -C120_THETA, -C120_THETA, C120_RHO                         \
       }                                                                        \
     }                                                                          \
   }
-
 
 class su2_120CellElement : public su2Element {
 public:

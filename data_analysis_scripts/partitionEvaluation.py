@@ -65,8 +65,8 @@ def main():
 
     Path(WORK_DIR).mkdir(parents=True, exist_ok=True)
 
-    collectData = True
-    collectRefData = True
+    collectData = False
+    collectRefData = False
     #Record Reference Data
     referenceIterations = 100000
     thermTime = 4000

@@ -64,8 +64,8 @@ class partitionTest:
 def main():
     Path(WORK_DIR).mkdir(parents=True, exist_ok=True)
 
-    collectData = True
-    collectRefData = True
+    collectData = False
+    collectRefData = False
     #Record Reference Data
     referenceIterations = 1000000
     thermTime = 5000

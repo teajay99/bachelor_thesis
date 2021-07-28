@@ -121,9 +121,8 @@ def get120Cell():
     out = []
     for p in get5Cell():
         for q in get600Cell():
-            # out.append(
-            #     Quaternion(1 / sp.sqrt(2), 1 / sp.sqrt(2), 0, 0) * p * q)
-            out.append(p * q)
+
+        out.append(p * q)
     return out
 
 
@@ -132,12 +131,6 @@ def testMetropolisRotation():
     sPPoints = get120Cell()
     #points = [[sp.N(q.a), sp.N(q.b), sp.N(q.c), sp.N(q.d)] for q in sPPoints]
     #print(points)
-
-    id = Quaternion(1, 0, 0, 0)
-
-    u = sPPoints[0].conjugate() * id
-
-    #sPPoints = [p * u for p in sPPoints]
 
     points = [[sp.N(q.a), sp.N(q.b), sp.N(q.c), sp.N(q.d)] for q in sPPoints]
 
@@ -165,6 +158,7 @@ def testMetropolisRotation():
     neighbours[1] = getNeighbours(3)
     neighbours[2] = getNeighbours(5)
     neighbours[3] = getNeighbours(7)
+
 
     indexPerms = list(itertools.permutations([0, 1, 2, 3]))
     indexPerms = [list(k) for k in indexPerms]
@@ -300,7 +294,7 @@ def testMetropolisRotation():
     print(neighbourCounter)
 
 
-#testMetropolisRotation()
+testMetropolisRotation()
 
 # points = get120Cell()
 # pointsOrg = [
@@ -373,6 +367,8 @@ rotMats = [
                    -1 / 8 + sp.sqrt(5) / 8, 1 / 8 + 3 * sp.sqrt(5) / 8
                ]])
 ]
+
+
 
 
 def quadProd(m, n):
