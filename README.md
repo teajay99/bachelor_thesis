@@ -10,7 +10,7 @@ The [numerics](numerics) directory contains the implementation of the Metropolis
 
 ## data_analysis_scripts
 
-The [data_analysis_scripts](data_analysis_scripts) directory contains several python scripts calling the simulation found in the (numerics)[numerics] folder, and creates the diagrams found in the thesis from the results. Further details can be found [here](data_analysis_scrpits). 
+The [data_analysis_scripts](data_analysis_scripts) directory contains several python scripts calling the simulation found in the (numerics)[numerics] folder, and creates the diagrams found in the thesis from the results. Further details can be found [here](data_analysis_scrpits/README.md). 
 
 ## thesis
 
