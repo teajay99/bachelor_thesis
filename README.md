@@ -2,7 +2,7 @@
 
 Hello there,
 
-my name is Timo Jakobs and this repository contains my bachelor's thesis in physics supervised by Prof. Dr. Carsten Urbach from the university of Bonn. The thesis itself can be found [here](https://raw.githubusercontent.com/teajay99/bachelor_thesis/main/thesis/thesis.pdf). The three directories found here contain the following things:
+my name is Timo Jakobs and this repository contains my bachelor's thesis in physics supervised by Prof. Dr. Carsten Urbach from the University of Bonn. The thesis itself can be found [here](https://raw.githubusercontent.com/teajay99/bachelor_thesis/main/thesis/thesis.pdf). The three directories found here contain the following things:
 
 ## numerics
 
