@@ -40,6 +40,19 @@ def strongCouplingExp(x, d=4):
     return out
 
 
+def strongCouplingExpFull(x, d=4):
+    out = x / 4
+    out += -(1 / 96) * (x**3)
+    out += (7 / 1536) * (x**5)
+    out += -(31 / 23040) * (x**7)
+    out += (4451 / 8847360) * (x**9)
+    out += -(264883 / 1486356480) * (x**11)
+    out += (403651 / 5945425920) * (x**13)
+    out += -(1826017873 / 68491306598400) * (x**15)
+
+    return out
+
+
 #
 #  Weak Coupling Expansion for 6^4 lattice from
 #  https://www.researchgate.net/publication/1739772_Series_expansions_of_the_density_of_states_in_SU2_lattice_gauge_theory
@@ -61,4 +74,4 @@ def weakCouplingExp6(x):
 
 
 def inverseWeakCouplingExp6(x):
-    return weakCouplingExp6(1/x)
+    return weakCouplingExp6(1 / x)

@@ -10,7 +10,6 @@ __global__ void kernel_probeSite(su2Action<dim> act, su2Type *fields,
                                  CUDA_RAND_STATE_TYPE *randStates,
                                  int *hitCounts, int multiProbe, double delta,
                                  int odd, int mu) {
-
   int idx = (threadIdx.x + blockDim.x * blockIdx.x);
   int site = 2 * idx;
   int offset = 0;
@@ -29,8 +28,10 @@ __global__ void kernel_probeSite(su2Action<dim> act, su2Type *fields,
     su2Type newElement = fields[loc].randomize(delta, &randStates[idx]);
     double change =
         act.template evaluateDelta<su2Type>(fields, newElement, site, mu);
-    if ((change < 0) ||
-        (curand_uniform_double(&randStates[idx]) < exp(-change))) {
+
+    change = (newElement.getWeight() / fields[loc].getWeight()) * exp(-change);
+
+    if ((change > 1.0) || (curand_uniform_double(&randStates[idx]) < change)) {
       fields[loc] = newElement;
       hitCounts[idx]++;
     }
@@ -116,7 +117,6 @@ cudaMetropolizer<dim, su2Type>::cudaMetropolizer(su2Action<dim> iAction,
 
   blockCount =
       ((action.getSiteCount() / 2) + CUDA_BLOCK_SIZE - 1) / CUDA_BLOCK_SIZE;
-
 
   cudaMalloc(&randStates,
              sizeof(CUDA_RAND_STATE_TYPE) * (action.getSiteCount() / 2));

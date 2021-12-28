@@ -5,7 +5,7 @@
 
 #define CUBE_EPS 1e-8
 
-class su2VolleyElement : public su2Element {
+template <bool weighted> class su2VolleyElement : public su2Element {
 public:
   __device__ __host__ su2VolleyElement() : su2VolleyElement(0){};
 
@@ -45,10 +45,10 @@ public:
 
   su2VolleyElement randomize(double delta, std::mt19937 &gen) {
     std::uniform_int_distribution<> dist(0, 7);
-    bool succes = false;
+    bool success = false;
     su2VolleyElement out;
-    while (!succes) {
-      out = randomize(dist(gen), &succes);
+    while (!success) {
+      out = randomize(dist(gen), &success);
     }
     return out;
   };
@@ -56,21 +56,23 @@ public:
   __device__ su2VolleyElement randomize(double delta,
 
                                         CUDA_RAND_STATE_TYPE *state) {
-    bool succes = false;
+    bool success = false;
     su2VolleyElement out;
-    while (succes == false) {
+    while (success == false) {
       int n = 8;
       while ((n == 8)) {
         double t = curand_uniform_double(state) * 8;
         n = (int)t;
       }
-      out = randomize(n, &succes);
+      out = randomize(n, &success);
     }
     return out;
   };
 
+  __device__ __host__ double getWeight(){return 1.0;};
+
 protected:
-  __device__ __host__ su2VolleyElement randomize(int direction, bool *succes) {
+  __device__ __host__ su2VolleyElement randomize(int direction, bool *success) {
     int index = (direction & 6) >> 1;
 
     int sign = 1 - (2 * (direction & 1));
@@ -86,8 +88,8 @@ protected:
       for (int i = 0; i < 4; i++) {
         if (abs(abs(newCubeCoords[i]) - 1) < CUBE_EPS) {
 
-          *succes = true;
-          //printf("Success!!!");
+          *success = true;
+          // printf("Success!!!");
         }
       }
     }
@@ -116,5 +118,19 @@ protected:
   double cubeCoords[4];
   int subdivs;
 };
+
+template class su2VolleyElement<false>;
+
+template <> __device__ __host__ inline double su2VolleyElement<true>::getWeight() {
+  double weight = 0;
+
+  for (int i = 0; i < 4; i++) {
+    weight += cubeCoords[i] * cubeCoords[i];
+  }
+
+  weight = pow(weight, -1.5);
+  return weight;
+}
+
 
 #endif /*SU2VOLLEYElEMENT_HPP*/

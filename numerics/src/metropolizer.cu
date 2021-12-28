@@ -10,8 +10,7 @@ metropolizer<dim, su2Type>::metropolizer(su2Action<dim> iAction,
   fields = iFields;
 }
 
-template <int dim, class su2Type> metropolizer<dim, su2Type>::~metropolizer() {
-}
+template <int dim, class su2Type> metropolizer<dim, su2Type>::~metropolizer() {}
 
 template <int dim, class su2Type>
 double metropolizer<dim, su2Type>::sweep(int sweeps) {
@@ -26,8 +25,11 @@ double metropolizer<dim, su2Type>::sweep(int sweeps) {
         int loc = (dim * site) + mu;
         for (int i = 0; i < multiProbe; i++) {
           su2Type newElement = fields[loc].randomize(delta, generator);
-          double change = action.evaluateDelta(fields, newElement, site, mu);
-          if ((change < 0) || (uni_dist(generator) < exp(-change))) {
+          double change =
+              (newElement.getWeight() / fields[loc].getWeight()) *
+              exp(-action.evaluateDelta(fields, newElement, site, mu));
+
+          if ((change > 1.0) || (uni_dist(generator) < change)) {
             fields[loc] = newElement;
             hitCount++;
           }

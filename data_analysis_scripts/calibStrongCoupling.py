@@ -24,16 +24,16 @@ def main():
     betas = scanBetas = np.linspace(0.1, 10, 100)
     deltas = helpers.getDeltas(betas)
 
-    collectData = True
+    # collectData = False
+    #
+    # if collectData:
+    #     ex.recordGPUData(latSize, betas, deltas, 4 * sweeps,
+    #                      WORK_DIR + "/gpu_data")
+    #
+    #     ex.runEvaluator(WORK_DIR + "/gpu_data", WORK_DIR + "/data.csv",
+    #                     thermTime)
 
-    if collectData:
-        ex.recordGPUData(latSize, betas, deltas, 4 * sweeps,
-                         WORK_DIR + "/gpu_data")
-
-        ex.runEvaluator(WORK_DIR + "/gpu_data", WORK_DIR + "/data.csv",
-                        thermTime)
-
-    data = np.loadtxt(WORK_DIR + "/data.csv", dtype=np.float64)
+    data = np.loadtxt("tmpData/partitionEvaluation/ref_data.csv", dtype=np.float64)
 
     plaquettes = np.array(
         [ufloat(data[i, 1], data[i, 2]) for i in range(len(data[:, 0]))])
@@ -57,15 +57,27 @@ def main():
     pltLib.endPlot()
 
     pltLib.startNewPlot("$\\beta$", "$P$", "")
+    pltLib.ax.set_ylim([-0.56,0.99])
     pltLib.plotPoints(betas, [i.n for i in plaquettes],
-                      label="GPU Data(" + str((4 * sweeps) - thermTime) +
-                      " sweeps)",
+                      label="Data Points",
                       s=10)
 
     pltLib.export("export/referenceDataSet.pgf",
-                  width=0.54 / 1.08,
-                  height=1.08,
-                  legend=False)
+                  width=0.55,
+                  height=1.25)
+    pltLib.plotFunc(helpers.strongCouplingExpFull,
+                    0.0,
+                    1.6,
+                    label="Strong Coupling Expansion")
+    pltLib.plotFunc(helpers.weakCouplingExp6,
+                    1.9,
+                    10,
+                    label="Weak Coupling Expansion",clr="b")
+
+
+    pltLib.export("export/referenceDataSetExp.pgf",
+                  width=0.55,
+                  height=1.25)
     pltLib.endPlot()
 
 

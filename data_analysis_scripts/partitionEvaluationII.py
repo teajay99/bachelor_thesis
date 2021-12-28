@@ -45,7 +45,7 @@ class partitionTest:
         path = WORK_DIR + "/" + self.folderName
         if cold:
             path += "_cold"
-        if collectData:
+        if collectData  and (not os.path.exists(path)):
             ex.recordGPUData(8,
                              betas,
                              deltas,
@@ -145,6 +145,10 @@ def main():
                                 [u.n for u in deviations[i]], None,
                                 [u.std_dev for u in deviations[i]])
         pltLib.export("export/systemCheck" + str(scanBetas[i]) + ".pgf",
+                      width=1.1,
+                      height=0.65,
+                      legend=False)
+        pltLib.export("export/systemCheck" + str(scanBetas[i]) + ".png",
                       width=1.1,
                       height=0.65,
                       legend=False)

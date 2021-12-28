@@ -51,9 +51,9 @@ void initFieldType(su2Type *fields, int nMax, bool cold, int iterations = 1) {
   }
 }
 
-template <int dim>
-__global__ void kernel_initVolleyFields(su2VolleyElement *fields, int nMax,
-                                        bool cold, int subdivs) {
+template <int dim, class su2Type>
+__global__ void kernel_initVolleyFields(su2Type *fields, int nMax, bool cold,
+                                        int subdivs) {
   int idx = threadIdx.x + blockDim.x * blockIdx.x;
 
   CUDA_RAND_STATE_TYPE state;
@@ -62,7 +62,7 @@ __global__ void kernel_initVolleyFields(su2VolleyElement *fields, int nMax,
   if (idx < nMax) {
     for (int mu = 0; mu < dim; mu++) {
       int loc = (dim * idx) + mu;
-      fields[loc] = su2VolleyElement(subdivs);
+      fields[loc] = su2Type(subdivs);
     }
 
     if (!cold) {
@@ -76,16 +76,15 @@ __global__ void kernel_initVolleyFields(su2VolleyElement *fields, int nMax,
   }
 }
 
-template <int dim>
-void initVolleyFields(su2VolleyElement *fields, int nMax, bool cold,
-                      int subdivs) {
+template <int dim, class su2Type>
+void initVolleyFields(su2Type *fields, int nMax, bool cold, int subdivs) {
 
   std::mt19937 generator;
 
   for (int idx = 0; idx < nMax; idx++) {
     for (int mu = 0; mu < dim; mu++) {
       int loc = (dim * idx) + mu;
-      fields[loc] = su2VolleyElement(subdivs);
+      fields[loc] = su2Type(subdivs);
     }
 
     if (!cold) {
@@ -173,7 +172,16 @@ executor<dim>::executor(int iLatSize, double iBeta, int iMultiProbe,
     fieldsSize *= sizeof(su2ListElement);
     break;
   case SU2_VOLLEY_ELEMENT:
-    fieldsSize *= sizeof(su2VolleyElement);
+    fieldsSize *= sizeof(su2VolleyElement<false>);
+    break;
+  case SU2_WEIGHTED_VOLLEY_ELEMENT:
+    fieldsSize *= sizeof(su2VolleyElement<true>);
+    break;
+  case SU2_LINEAR_ELEMENT:
+    fieldsSize *= sizeof(su2LinearElement<false>);
+    break;
+  case SU2_WEIGHTED_LINEAR_ELEMENT:
+    fieldsSize *= sizeof(su2LinearElement<true>);
     break;
   case SU2_5_CELL_ELEMENT:
     fieldsSize *= sizeof(su2_5CellElement);
@@ -232,8 +240,28 @@ template <int dim> void executor<dim>::initFields(bool cold) {
       loadListFields(cold);
       break;
     case SU2_VOLLEY_ELEMENT:
-      kernel_initVolleyFields<dim><<<blockCount, CUDA_BLOCK_SIZE>>>(
-          (su2VolleyElement *)fields, action.getSiteCount(), cold, subdivs);
+      kernel_initVolleyFields<dim, su2VolleyElement<false>>
+          <<<blockCount, CUDA_BLOCK_SIZE>>>((su2VolleyElement<false> *)fields,
+                                            action.getSiteCount(), cold,
+                                            subdivs);
+      break;
+    case SU2_WEIGHTED_VOLLEY_ELEMENT:
+      kernel_initVolleyFields<dim, su2VolleyElement<true>>
+          <<<blockCount, CUDA_BLOCK_SIZE>>>((su2VolleyElement<true> *)fields,
+                                            action.getSiteCount(), cold,
+                                            subdivs);
+      break;
+    case SU2_LINEAR_ELEMENT:
+      kernel_initVolleyFields<dim, su2LinearElement<false>>
+          <<<blockCount, CUDA_BLOCK_SIZE>>>((su2LinearElement<false> *)fields,
+                                            action.getSiteCount(), cold,
+                                            subdivs);
+      break;
+    case SU2_WEIGHTED_LINEAR_ELEMENT:
+      kernel_initVolleyFields<dim, su2LinearElement<true>>
+          <<<blockCount, CUDA_BLOCK_SIZE>>>((su2LinearElement<true> *)fields,
+                                            action.getSiteCount(), cold,
+                                            subdivs);
       break;
     case SU2_5_CELL_ELEMENT:
       kernel_initFieldType<dim, su2_5CellElement>
@@ -273,8 +301,24 @@ template <int dim> void executor<dim>::initFields(bool cold) {
       loadListFields(cold);
       break;
     case SU2_VOLLEY_ELEMENT:
-      initVolleyFields<dim>((su2VolleyElement *)fields, action.getSiteCount(),
-                            cold, subdivs);
+      initVolleyFields<dim, su2VolleyElement<false>>(
+          (su2VolleyElement<false> *)fields, action.getSiteCount(), cold,
+          subdivs);
+      break;
+    case SU2_WEIGHTED_VOLLEY_ELEMENT:
+      initVolleyFields<dim, su2VolleyElement<true>>(
+          (su2VolleyElement<true> *)fields, action.getSiteCount(), cold,
+          subdivs);
+      break;
+    case SU2_LINEAR_ELEMENT:
+      initVolleyFields<dim, su2LinearElement<false>>(
+          (su2LinearElement<false> *)fields, action.getSiteCount(), cold,
+          subdivs);
+      break;
+    case SU2_WEIGHTED_LINEAR_ELEMENT:
+      initVolleyFields<dim, su2LinearElement<true>>(
+          (su2LinearElement<true> *)fields, action.getSiteCount(), cold,
+          subdivs);
       break;
     case SU2_5_CELL_ELEMENT:
       initFieldType<dim, su2_5CellElement>((su2_5CellElement *)fields,
@@ -314,7 +358,18 @@ void executor<dim>::run(int measurements, int multiSweep, std::string outFile) {
     this->runMetropolis<su2ListElement>(measurements, multiSweep, file);
     break;
   case SU2_VOLLEY_ELEMENT:
-    this->runMetropolis<su2VolleyElement>(measurements, multiSweep, file);
+    this->runMetropolis<su2VolleyElement<false>>(measurements, multiSweep,
+                                                 file);
+    break;
+  case SU2_WEIGHTED_VOLLEY_ELEMENT:
+    this->runMetropolis<su2VolleyElement<true>>(measurements, multiSweep, file);
+    break;
+  case SU2_LINEAR_ELEMENT:
+    this->runMetropolis<su2LinearElement<false>>(measurements, multiSweep,
+                                                 file);
+    break;
+  case SU2_WEIGHTED_LINEAR_ELEMENT:
+    this->runMetropolis<su2LinearElement<true>>(measurements, multiSweep, file);
     break;
   case SU2_5_CELL_ELEMENT:
     this->runMetropolis<su2_5CellElement>(measurements, multiSweep, file);

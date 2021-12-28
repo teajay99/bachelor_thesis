@@ -46,8 +46,15 @@ cxxopts::Options getOptions() {
       "Use custom partition provided by an additional List (.csv) File",
       cxxopts::value<std::string>())(
       "partition-volley", "Use volleybal mesh on SU(2)", cxxopts::value<int>())(
-      "c,cold", "Cold Start")("v,verbose", "Verbose output",
-                              cxxopts::value<bool>()->default_value("false"));
+      "partition-volley-weighted",
+      "Use volleybal mesh on SU(2) with adjusted probabilities",
+      cxxopts::value<int>())("partition-linear", "Use linear mesh on SU(2)",
+                             cxxopts::value<int>())(
+      "partition-linear-weighted",
+      "Use linear mesh on SU(2) with adjusted probabilities",
+      cxxopts::value<int>())("c,cold", "Cold Start")(
+      "v,verbose", "Verbose output",
+      cxxopts::value<bool>()->default_value("false"));
 
   return options;
 }
@@ -110,6 +117,15 @@ int main(int argc, char **argv) {
     } else if (result.count("partition-volley")) {
       partType = SU2_VOLLEY_ELEMENT;
       subdivs = result["partition-volley"].as<int>();
+    } else if (result.count("partition-volley-weighted")) {
+      partType = SU2_WEIGHTED_VOLLEY_ELEMENT;
+      subdivs = result["partition-volley-weighted"].as<int>();
+    } else if (result.count("partition-linear")) {
+      partType = SU2_LINEAR_ELEMENT;
+      subdivs = result["partition-linear"].as<int>();
+    } else if (result.count("partition-linear-weighted")) {
+      partType = SU2_WEIGHTED_LINEAR_ELEMENT;
+      subdivs = result["partition-linear-weighted"].as<int>();
     }
 
     beta = result["beta"].as<double>();

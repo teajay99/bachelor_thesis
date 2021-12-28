@@ -45,7 +45,7 @@ class partitionTest:
         path = WORK_DIR + "/" + self.folderName
         if cold:
             path += "_cold"
-        if collectData:
+        if collectData and (not os.path.exists(path)):
             ex.recordGPUData(8,
                              betas,
                              deltas,
@@ -65,7 +65,7 @@ def main():
 
     Path(WORK_DIR).mkdir(parents=True, exist_ok=True)
 
-    collectData = False
+    collectData = True
     collectRefData = False
     #Record Reference Data
     referenceIterations = 100000
@@ -90,23 +90,72 @@ def main():
     #Generate Fibonacci Lattices
     fibCounts = [8, 16, 32, 64, 128, 256, 512]
 
-    partitions = [[
-        partitionTest("--partition-tet", "$\\overline{T}$"),
-        partitionTest("--partition-oct", "$\\overline{O}$"),
-        partitionTest("--partition-ico", "$\\overline{I}$")
-    ],
-                  [
-                      partitionTest("--partition-volley", "$V_1$", "1"),
-                      partitionTest("--partition-volley", "$V_2$", "2"),
-                      partitionTest("--partition-volley", "$V_3$", "3"),
-                      partitionTest("--partition-volley", "$V_4$", "4")
-                  ],
-                  [
-                      partitionTest("--partition-c5", "$C_5$"),
-                      partitionTest("--partition-c16", "$C_{16}$"),
-                      partitionTest("--partition-c8", "$C_8$"),
-                      partitionTest("--partition-c120", "$C_{120}$")
-                  ]]
+    partitions = [
+        [
+            partitionTest("--partition-tet", "$\\overline{T}$"),
+            partitionTest("--partition-oct", "$\\overline{O}$"),
+            partitionTest("--partition-ico", "$\\overline{I}$")
+        ],
+        [
+            partitionTest("--partition-volley", "$V_1$", "1"),
+            partitionTest("--partition-volley", "$V_2$", "2"),
+            partitionTest("--partition-volley", "$V_3$", "3"),
+            partitionTest("--partition-volley", "$V_4$", "4")
+        ],
+        [
+            partitionTest("--partition-volley-weighted", "$V_1^w$", "1"),
+            partitionTest("--partition-volley-weighted", "$V_2^w$", "2"),
+            partitionTest("--partition-volley-weighted", "$V_3^w$", "3"),
+            partitionTest("--partition-volley-weighted", "$V_4^w$", "4")
+        ],
+        [
+            partitionTest("--partition-volley", "$V_1$", "1"),
+            partitionTest("--partition-volley-weighted", "$V_1^w$", "1")
+        ],
+        [
+            partitionTest("--partition-volley", "$V_2$", "2"),
+            partitionTest("--partition-volley-weighted", "$V_2^w$", "2")
+        ],
+        [
+            partitionTest("--partition-volley", "$V_3$", "3"),
+            partitionTest("--partition-volley-weighted", "$V_3^w$", "3")
+        ],
+        [
+            partitionTest("--partition-volley", "$V_4$", "4"),
+            partitionTest("--partition-volley-weighted", "$V_4^w$", "4")
+        ],
+        [
+            partitionTest("--partition-linear", "$L_2$", "2"),
+            partitionTest("--partition-linear", "$L_3$", "3"),
+            partitionTest("--partition-linear", "$L_4$", "4"),
+            partitionTest("--partition-linear", "$L_5$", "5")
+        ],
+        [
+            partitionTest("--partition-linear-weighted", "$L_2^w$", "2"),
+            partitionTest("--partition-linear-weighted", "$L_3^w$", "3"),
+            partitionTest("--partition-linear-weighted", "$L_4^w$", "4"),
+            partitionTest("--partition-linear-weighted", "$L_5^w$", "5")
+        ],
+        [
+            partitionTest("--partition-linear", "$L_2$", "2"),
+            partitionTest("--partition-linear-weighted", "$L_2^w$", "2")
+        ],
+        [
+            partitionTest("--partition-linear", "$L_3$", "3"),
+            partitionTest("--partition-linear-weighted", "$L_3^w$", "3")
+        ],
+        [
+            partitionTest("--partition-linear", "$L_4$", "4"),
+            partitionTest("--partition-linear-weighted", "$L_4s^w$", "4")
+        ],
+        [
+            partitionTest("--partition-c5", "$C_5$"),
+            partitionTest("--partition-c16", "$C_{16}$"),
+            partitionTest("--partition-c8", "$C_8$"),
+            partitionTest("--partition-c120", "$C_{120}$")
+        ]
+    ]
+    #109,01
 
     fibParts = []
     for c in fibCounts:
@@ -121,13 +170,19 @@ def main():
     partitions.append(fibParts[4:])
 
     titles = [
-        "Subgroups", "Volleyball", "Regular Polytopes", "Fibonacci-I",
+        "Subgroups", "Volleyball", "Volleyball Adjusted",
+        "Volleyball Comparison 1 Subdivision",
+        "Volleyball Comparison 2 Subdivisions",
+        "Volleyball Comparison 3 Subdivisions",
+        "Volleyball Comparison 4 Subdivisions", "Linear", "Linear Adjusted",
+        "Linear Comparison 2", "Linear Comparison 3",
+        "Linear Comparison 4", "Linear Comparison 5", "Regular Polytopes", "Fibonacci-I",
         "Fibonacci-II"
     ]
 
     for i in range(len(partitions)):
-        pltLib.startNewPlot("$\\beta$", "$P-P_{\\textrm{ref}}$", "")
-        pltLib.setSymLogScale(False, True, ythresh=1e-3)
+        pltLib.startNewPlot("$\\beta$", "$P$", "")
+        #pltLib.setSymLogScale(False, True, ythresh=1e-3)
         pltLib.ax.yaxis.grid(which='minor', alpha=0.3)
 
         tableData = [scanBetas]
@@ -135,10 +190,10 @@ def main():
         for j in range(len(partitions[i])):
             coldData = partitions[i][j].measure(scanBetas, deltas, thermTime,
                                                 True,
-                                                collectData) - refPlaquettes
+                                                collectData)  # - refPlaquettes
             hotData = partitions[i][j].measure(scanBetas, deltas, thermTime,
                                                False,
-                                               collectData) - refPlaquettes
+                                               collectData)  # - refPlaquettes
             tableData.extend([np.array(coldData), np.array(hotData)])
             pltLib.plot1DErrPoints(scanBetas,
                                    coldData,
@@ -157,8 +212,12 @@ def main():
             pltLib.plotLine(scanBetas, [i.n for i in hotData],
                             clr=CLR[2 * j + 1],
                             alpha=1)
+            pltLib.plotLine(scanBetas, [i.n for i in refPlaquettes], clr="k")
 
         pltLib.export("export/" + titles[i].replace(" ", "") + ".pgf",
+                      width=1.08,
+                      height=0.9)
+        pltLib.export("export/" + titles[i].replace(" ", "") + ".png",
                       width=1.08,
                       height=0.9)
         pltLib.endPlot()

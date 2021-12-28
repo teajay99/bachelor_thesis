@@ -30,10 +30,13 @@ template class metropolizer<4, su2TetElement>;
 template class metropolizer<4, su2OctElement>;
 template class metropolizer<4, su2IcoElement>;
 template class metropolizer<4, su2ListElement>;
-template class metropolizer<4, su2VolleyElement>;
+template class metropolizer<4, su2VolleyElement<false>>;
+template class metropolizer<4, su2VolleyElement<true>>;
 template class metropolizer<4, su2_5CellElement>;
 template class metropolizer<4, su2_16CellElement>;
 template class metropolizer<4, su2_120CellElement>;
+template class metropolizer<4, su2LinearElement<false>>;
+template class metropolizer<4, su2LinearElement<true>>;
 
 
 #endif

@@ -188,7 +188,7 @@ def export(fname, legendLoc='best', legend=True, width=None, height=1.0):
                             height * width * 6.49733 * (5.0**.5 - 1.0) / 2.0)
         #6.49733
 
-    plt.savefig(fname, dpi=400, bbox_inches="tight")
+    plt.savefig(fname, dpi=400, bbox_inches="tight")#, transparent=True)
 
 
 def startNewPlot(xText, yText, titleText, grid=True):
@@ -243,7 +243,7 @@ def plotErrPoints(x, y, label="", clr='k'):
                      clr=clr)
 
 
-def plot1DErrPoints(x, y, label="", clr='k'):
+def plot1DErrPoints(x, y, label="", clr='k', alpha=1):
     ax.errorbar(
         x,
         np.array([i.n for i in y]),
@@ -257,11 +257,12 @@ def plot1DErrPoints(x, y, label="", clr='k'):
         capsize=2,
         capthick=0.5,
         barsabove=True,
-        label=label)
+        label=label,
+        alpha=alpha)
 
 
-def plotPoints(x, y, label="", clr='k', marker="+", s=20):
-    ax.scatter(x, y, label=label, color=clr, marker=marker, s=s)
+def plotPoints(x, y, label="", clr='k', marker=".", s=15, alpha=1):
+    ax.scatter(x, y, label=label, color=clr, marker=marker, s=s, alpha=alpha)
 
 
 def plotImage(img, pixel_length, cmap='jet', cbarlbl=None):
@@ -348,7 +349,7 @@ def plotFunc(func,
             linestyle=linestyle)
 
 
-def plotLine(x, y, label="", clr="k", ls="-", linewidth=1, alpha=1):
+def plotLine(x, y, label="", clr="k", ls="-", linewidth=1, alpha=1, zorder=2):
     ax.plot(np.array([i for i in x]),
             np.array([i for i in y]),
             label=label,
@@ -356,7 +357,8 @@ def plotLine(x, y, label="", clr="k", ls="-", linewidth=1, alpha=1):
             color=clr,
             ls=ls,
             linewidth=linewidth,
-            alpha=alpha)
+            alpha=alpha,
+            zorder=zorder)
 
 
 def plotConfCurve(func,

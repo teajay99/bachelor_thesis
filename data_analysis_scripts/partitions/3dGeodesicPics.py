@@ -21,6 +21,42 @@ RESOLUTION = 600
 ORIENTATION1 = [0.975528, 0.154508, -0.154508, -0.024472]
 ORIENTATION2 = [0.975528, 0.154508, -0.154508, -0.024472]
 
+platonic_solid_vertices = {
+    'Tetrahedron':
+    [[k[0] * 1.8, k[1] * 1.8, k[2] * 1.8]
+     for k in [[0.0, 0.0, 0.612372], [-0.288675, -0.5, -0.204124],
+               [-0.288675, 0.5, -0.204124], [0.57735, 0.0, -0.204124]]],
+    'Cube': [[k[0] * 1.3, k[1] * 1.3, k[2] * 1.3]
+             for k in [[-0.5, -0.5, -0.5], [-0.5, -0.5, 0.5],
+                       [-0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, -0.5, -0.5],
+                       [0.5, -0.5, 0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5]]],
+    'Octahedron': [[k[0] * 1.6, k[1] * 1.6, k[2] / 1.6]
+                   for k in [[-0.707107, 0.0, 0.0], [0.0, 0.707107, 0.0],
+                             [0.0, 0.0, -0.707107], [0.0, 0.0, 0.707107],
+                             [0.0, -0.707107, 0.0], [0.707107, 0.0, 0.0]]],
+    'Dodecahedron':
+    [[k[0] / 1.4, k[1] / 1.4, k[2] / 1.4]
+     for k in [[-1.37638, 0.0, 0.262866], [1.37638, 0.0, -0.262866],
+               [-0.425325, -1.30902, 0.262866], [-0.425325, 1.30902, 0.262866],
+               [1.11352, -0.809017, 0.262866], [1.11352, 0.809017, 0.262866],
+               [-0.262866, -0.809017, 1.11352], [-0.262866, 0.809017, 1.11352],
+               [-0.688191, -0.5, -1.11352], [-0.688191, 0.5, -1.11352],
+               [0.688191, -0.5, 1.11352], [0.688191, 0.5, 1.11352],
+               [0.850651, 0.0, -1.11352], [-1.11352, -0.809017, -0.262866],
+               [-1.11352, 0.809017, -0.262866], [-0.850651, 0.0, 1.11352],
+               [0.262866, -0.809017, -1.11352], [0.262866, 0.809017, -1.11352],
+               [0.425325, -1.30902, -0.262866], [0.425325, 1.30902, -0.262866]]
+     ],
+    'Icosahedron':
+    [[k[0] * 1.15, k[1] * 1.15, k[2] * 1.15] for k in
+     [[0.0, 0.0, -0.951057], [0.0, 0.0, 0.951057], [-0.850651, 0.0, -0.425325],
+      [0.850651, 0.0, 0.425325], [0.688191, -0.5, -0.425325],
+      [0.688191, 0.5, -0.425325], [-0.688191, -0.5, 0.425325],
+      [-0.688191, 0.5, 0.425325], [-0.262866, -0.809017, -0.425325],
+      [-0.262866, 0.809017, -0.425325], [0.262866, -0.809017, 0.425325],
+      [0.262866, 0.809017, 0.425325]]],
+}
+
 
 def removeDulicates(points):
     out = []
@@ -177,7 +213,7 @@ def render_cube(subdivs, fname):
                                                  0.]), np.array([0., 0., 0.])
 
                     INSIDE_MARGIN = 0.015
-                    
+
                     a[face] = sign * 0.5
                     b[face] = sign * 0.5
                     c[face] = sign * 0.5
@@ -320,16 +356,23 @@ def getSpherePoints(N):
     return out
 
 
-render_cube(3, "volleyball.png")
-print("volleyball.png rendered succesfully")
+# render_cube(3, "volleyball.png")
+# print("volleyball.png rendered succesfully")
+#
+# render_stuff([
+#     get_ico_vertices(0),
+#     get_ico_vertices(3), [v / np.linalg.norm(v) for v in get_ico_vertices(3)]
+# ], 'icosphere.png')
+# print("icosphere.png rendered succesfully")
+#
+# render_stuff([getSpherePoints(20),
+#               getSpherePoints(100),
+#               getSpherePoints(500)], "fibonacci3d.png")
+# print("fibonacci3d.png rendered succesfully")
 
 render_stuff([
-    get_ico_vertices(0),
-    get_ico_vertices(3), [v / np.linalg.norm(v) for v in get_ico_vertices(3)]
-], 'icosphere.png')
-print("icosphere.png rendered succesfully")
-
-render_stuff([getSpherePoints(20),
-              getSpherePoints(100),
-              getSpherePoints(500)], "fibonacci3d.png")
-print("fibonacci3d.png rendered succesfully")
+    platonic_solid_vertices["Tetrahedron"], platonic_solid_vertices["Cube"],
+    platonic_solid_vertices["Octahedron"],
+    platonic_solid_vertices["Dodecahedron"],
+    platonic_solid_vertices["Icosahedron"]
+], "platonic_solids.png")

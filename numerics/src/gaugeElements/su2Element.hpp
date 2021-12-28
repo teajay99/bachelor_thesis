@@ -87,6 +87,8 @@ public:
     }
   };
 
+  __device__ __host__ double getWeight() { return 1.0; }
+
 protected:
   __device__ __host__ su2Element randomize(double alpha, double *pnt) {
     double norm = 0;
