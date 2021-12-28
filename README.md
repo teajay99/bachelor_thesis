@@ -15,3 +15,5 @@ The [`data_analysis_scripts`](data_analysis_scripts) directory contains several 
 ## thesis
 
 In the [`thesis`](thesis) folder, the LaTeX source code of the final report can be found. It also contain some symbolic links to plots and pictures created within the export folder in the [`data_analysis_scripts`](data_analysis_scripts) folder. These are unresolved, when initially cloning the repository, as the files are created by the python scripts found in the [`data_analysis_scripts`](data_analysis_scripts).
+
+(The thesis as handed in can be found in the thesis_hand_in_state branch. The main branch will contain further changes to adjust plots for the presentation, as well as correct minor typos.)
